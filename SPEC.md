@@ -258,7 +258,7 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 
 17. **[UZUPEŁNIENIE] Hosting publiczny wymaga autoryzacji jako elementu MVP** — aplikacja przetwarza dane finansowe; brak logowania byłby błędem konstrukcyjnym, nie brakiem funkcji.
 
-18. **[UZUPEŁNIENIE] Rozdział instancji demo i produkcyjnej** — instancja udostępniana organizatorom kursu pracuje wyłącznie na danych syntetycznych. Rzeczywiste dane sprzedażowe (nazwy klientów, NIP-y, kwoty) są wrażliwe biznesowo i objęte zobowiązaniami wobec klientów oraz funduszy; nie mogą znaleźć się w instancji dostępnej publicznie.
+18. **[UZUPEŁNIENIE] Rozdział instancji demo i produkcyjnej** — instancja udostępniana organizatorom kursu pracuje wyłącznie na danych syntetycznych. Uzasadnienie: prostota rozdziału i brak potrzeby publicznego ujawniania rzeczywistych wyników sprzedażowych — niezależnie od tego, czy dany klient jest objęty poufnością (patrz decyzja 25, która precyzuje, że poufność per klient to osobna, węższa sprawa).
 
 19. **[UZUPEŁNIENIE] Format pliku importowego .xlsx, nie CSV** — eliminuje problem separatora dziesiętnego i kodowania, skraca ścieżkę użytkownika.
 
@@ -271,6 +271,8 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 23. **[UZUPEŁNIENIE] Plik importowy ma zawsze dokładnie jeden wiersz nagłówkowy** — arkusz źródłowy „Sprzedaż" ma nad kolumnami miesięcy dwa scalone wiersze nagłówkowe (rok, potem miesiąc), a liczba wierszy nagłówkowych w pliku przygotowywanym do importu (kopiuj-wklej) zależała dotąd od decyzji osoby przygotowującej plik (0, 1 lub 2). Ustalono sztywno: zawsze jeden. Przypisanie kolumn do miesięcy jest i tak wyłącznie pozycyjne (II.4), więc treść nagłówka nad kolumnami miesięcy nie ma znaczenia dla obliczeń — ale jego liczba musi być stała, żeby import pozostał deterministyczny. Rozstrzyga otwarte pytanie P2 z `PLAN.md`.
 
 24. **[UZUPEŁNIENIE] Generator danych syntetycznych generuje dwa warianty pliku** (`--clean` do demo, `--with-errors` do testów walidacji) — szczegóły w VI.9. Golden file (z celowymi błędami) i dane demo (w całości poprawne) to dwa różne pliki, nie jeden — import całościowy (decyzja 2) odrzuciłby plik z błędami w całości, więc nie dałoby się nim zasilić instancji demo.
+
+25. **[UZUPEŁNIENIE] Rzeczywisty zakres poufności danych sprzedażowych jest wąski** — dotyczy tylko 3 konkretnych klientów objętych dodatkowymi umowami o poufności, nie całego zbioru danych. Poprzednia wersja decyzji 18 sugerowała poufność wszystkich danych sprzedażowych — to było zawyżone. **Konsekwencja dla pliku do backtestu (zadanie 0.8, lokalny, nigdy niecommitowany):** dane tych 3 klientów podmieniane są na dane innych firm (technika już stosowana przy prezentacji budżetów innym funduszom), pozostali klienci mogą pozostać niezmienieni. Nie zmienia to decyzji 18 dla instancji demo — tam powodem pełnej syntetyczności jest brak potrzeby publicznego ujawniania wyników, nie tylko poufność per klient.
 
 ---
 
@@ -363,6 +365,7 @@ Instancja produkcyjna to osobny projekt Vercel + osobny projekt Supabase, ten sa
 7. **Sekcja VI** — całość wymagań niefunkcjonalnych: hosting, autoryzacja, rozdział instancji demo/produkcyjnej, eksport, precyzja liczbowa, wydajność, bezpieczeństwo, jakość, zakres poza MVP.
 8. **II.4** — liczba wierszy nagłówkowych pliku importowego (zawsze dokładnie jeden), rozstrzygnięcie otwartego pytania `PLAN.md` P2.
 9. **VI.9** — generator danych syntetycznych w dwóch trybach (`--clean` / `--with-errors`), rozdzielenie golden file od danych demo.
-10. **V.15–24** — decyzje projektowe wynikające z powyższych uzupełnień.
+10. **V.18 (korekta)** — zawężenie zakresu poufności danych sprzedażowych do 3 konkretnych klientów objętych NDA, zamiast całego zbioru danych; patrz nowa decyzja 25.
+11. **V.15–25** — decyzje projektowe wynikające z powyższych uzupełnień.
 
 **Redakcja:** treść merytoryczna sekcji I–V zachowana; ujednolicono formatowanie, poprawiono literówki, ponumerowano procedury referencyjne.
