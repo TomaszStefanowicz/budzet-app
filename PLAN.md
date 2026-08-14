@@ -16,7 +16,7 @@ Cel: działający publiczny link i wszystko, co potrzebne, żeby dalej pisać ju
 - [x] **0.2** Szkielet Next.js + TypeScript, konfiguracja Vitest, `.gitignore` z `.env.local`.
 - [x] **0.3** Projekt Supabase, podpięcie do Vercela, zmienne środowiskowe.
 - [ ] **0.4** Pierwsza migracja SQL w `supabase/migrations/` — tabele wg `SPEC.md` IV.5. Struktura bazy powstaje z pliku, nie z panelu.
-- [ ] **0.5** Deploy na Vercel z gałęzi `main`. **Publiczny link musi działać.**
+- [x] **0.5** Deploy na Vercel z gałęzi `main`. **Publiczny link musi działać.** → https://budzet-app-sigma.vercel.app
 - [ ] **0.6** Supabase Auth: strona logowania, middleware blokujący wszystkie pozostałe ścieżki, rejestracja samodzielna wyłączona. Konto właściciela.
 - [ ] **0.7** **Generator danych syntetycznych** (skrypt w repo) produkujący plik `.xlsx` zgodny z `SPEC.md` II — dane oczywiście fikcyjne, z wszystkimi przypadkami brzegowymi z `SPEC.md` VI.9. To jednocześnie „golden file" do testów i zbiór demo dla organizatorów.
 - [ ] **0.8** Plik testowy z prawdziwej struktury: zanonimizowany wycinek rzeczywistych danych **do użytku wyłącznie lokalnego**, nigdy commitowany. Potrzebny do backtestu w Etapie 2.
