@@ -20,7 +20,7 @@ Cel: działający publiczny link i wszystko, co potrzebne, żeby dalej pisać ju
 - [x] **0.4a** Migracja SQL: tabela `imports` (metryki importu — data, nazwa pliku, liczba wersów, wynik walidacji, zakres wykrytych miesięcy). Struktura bazy powstaje z pliku, nie z panelu.
 - [x] **0.5** Deploy na Vercel z gałęzi `main`. **Publiczny link musi działać.** → https://budzet-app-sigma.vercel.app
 - [x] **0.6** Supabase Auth: strona logowania, middleware blokujący wszystkie pozostałe ścieżki, rejestracja samodzielna wyłączona. Konto właściciela.
-- [ ] **0.4b** Prosty ekran podglądu (po zalogowaniu) czytający z tabeli `imports` — potwierdzenie, że przeglądarka → API → baza działają razem, zanim dołożymy kolejne tabele.
+- [x] **0.4b** Prosty ekran podglądu (po zalogowaniu) czytający z tabeli `imports` — potwierdzenie, że przeglądarka → API → baza działają razem, zanim dołożymy kolejne tabele.
 - [ ] **0.7** **Generator danych syntetycznych** (skrypt w repo, nie jednorazowy plik) produkujący plik `.xlsx` zgodny z `SPEC.md` II — dane oczywiście fikcyjne, z wszystkimi przypadkami brzegowymi z `SPEC.md` VI.9. To jednocześnie „golden file" do testów i zbiór demo dla organizatorów.
 - [ ] **0.8** Plik testowy z prawdziwej struktury: zanonimizowany wycinek rzeczywistych danych **do użytku wyłącznie lokalnego**, nigdy commitowany. Potrzebny do backtestu w Etapie 2.
 
