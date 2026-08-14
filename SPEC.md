@@ -270,6 +270,8 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 
 23. **[UZUPEŁNIENIE] Plik importowy ma zawsze dokładnie jeden wiersz nagłówkowy** — arkusz źródłowy „Sprzedaż" ma nad kolumnami miesięcy dwa scalone wiersze nagłówkowe (rok, potem miesiąc), a liczba wierszy nagłówkowych w pliku przygotowywanym do importu (kopiuj-wklej) zależała dotąd od decyzji osoby przygotowującej plik (0, 1 lub 2). Ustalono sztywno: zawsze jeden. Przypisanie kolumn do miesięcy jest i tak wyłącznie pozycyjne (II.4), więc treść nagłówka nad kolumnami miesięcy nie ma znaczenia dla obliczeń — ale jego liczba musi być stała, żeby import pozostał deterministyczny. Rozstrzyga otwarte pytanie P2 z `PLAN.md`.
 
+24. **[UZUPEŁNIENIE] Generator danych syntetycznych generuje dwa warianty pliku** (`--clean` do demo, `--with-errors` do testów walidacji) — szczegóły w VI.9. Golden file (z celowymi błędami) i dane demo (w całości poprawne) to dwa różne pliki, nie jeden — import całościowy (decyzja 2) odrzuciłby plik z błędami w całości, więc nie dałoby się nim zasilić instancji demo.
+
 ---
 
 ## VI. [UZUPEŁNIENIE] Wymagania niefunkcjonalne
@@ -336,6 +338,7 @@ Instancja produkcyjna to osobny projekt Vercel + osobny projekt Supabase, ten sa
 
 - Testy jednostkowe (Vitest) dla każdej reguły walidacji z pkt II.3 i każdego zestawienia z pkt III.
 - Fixture testowy: syntetyczny plik „golden file" zawierający wszystkie przypadki brzegowe (FKS, FVZK, wers bez flagi, wers z dwiema flagami, nieznany typ dokumentu, klient wracający po 13 miesiącach, klient wracający po 11 miesiącach, pakiet na granicy horyzontu danych).
+- **[UZUPEŁNIENIE] Generator danych syntetycznych ma dwa tryby wyjścia:** `--clean` (domyślny) — same poprawne przypadki brzegowe, plik importowalny w całości, używany do zasilenia instancji demo (zadanie 4.2); `--with-errors` — to samo plus celowo błędne wersy (brak flagi, dwie flagi, nieznany typ dokumentu, błędnie oznaczony powrót po 11/13 miesiącach), plik **nigdy nie importowany** do żadnej instancji, wyłącznie golden file do testów jednostkowych walidacji. Uzasadnienie: import jest całościowy (decyzja 2) — plik z celowymi błędami zostałby odrzucony w całości i nie dałoby się nim zasilić demo.
 - **Backtest przed zaliczeniem:** wyniki aplikacji porównane z dotychczasowymi ręcznymi zestawieniami za co najmniej 3 miesiące. Każda rozbieżność wyjaśniona — jako błąd aplikacji albo błąd procedury ręcznej.
 
 ### 10. Poza zakresem MVP
@@ -359,6 +362,7 @@ Instancja produkcyjna to osobny projekt Vercel + osobny projekt Supabase, ten sa
 6. **IV.5** — zarys modelu danych.
 7. **Sekcja VI** — całość wymagań niefunkcjonalnych: hosting, autoryzacja, rozdział instancji demo/produkcyjnej, eksport, precyzja liczbowa, wydajność, bezpieczeństwo, jakość, zakres poza MVP.
 8. **II.4** — liczba wierszy nagłówkowych pliku importowego (zawsze dokładnie jeden), rozstrzygnięcie otwartego pytania `PLAN.md` P2.
-9. **V.15–23** — decyzje projektowe wynikające z powyższych uzupełnień.
+9. **VI.9** — generator danych syntetycznych w dwóch trybach (`--clean` / `--with-errors`), rozdzielenie golden file od danych demo.
+10. **V.15–24** — decyzje projektowe wynikające z powyższych uzupełnień.
 
 **Redakcja:** treść merytoryczna sekcji I–V zachowana; ujednolicono formatowanie, poprawiono literówki, ponumerowano procedury referencyjne.
