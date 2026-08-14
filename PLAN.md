@@ -32,14 +32,16 @@ Cel: działający publiczny link i wszystko, co potrzebne, żeby dalej pisać ju
 
 Cel: serce aplikacji. To tu kryje się największe ryzyko z decyzji V.5 — „policzy błędnie, ale wiarygodnie".
 
-- [ ] **1.0** Migracja SQL: tabele `clients`, `revenue_items`, `revenue_months` (`SPEC.md` IV.5) — dokładane teraz, bo import ich potrzebuje (patrz `UZUPEŁNIENIE` w Etapie 0 o rozbiciu 0.4).
-- [ ] **1.1** Parser `.xlsx` (SheetJS): odczyt kolumn A–I, **dynamiczne wykrywanie zakresu kolumn miesięcznych** (`SPEC.md` II.2, II.4). Czysta funkcja w `lib/`, bez dostępu do bazy. Testy.
-- [ ] **1.2** Walidacja struktury: układ kolumn, format numeru dokumentu `TYP/rrrr/mm/nnnn`, format kwot, puste komórki miesięcy jako 0. Testy do każdej reguły.
+**[UZUPEŁNIENIE] Kolejność zadań — chodzący szkielet, potem warstwy walidacji.** Zamiast całej logiki najpierw i ekranu na końcu (jak w pierwotnym rozpisaniu), najpierw budujemy minimalny, ale kompletny szkielet uploadu (1.1) — testowalny ręcznie od razu plikiem syntetycznym — a dopiero na nim dokładamy kolejne warstwy walidacji, każdą z automatycznymi testami i widoczną natychmiast na ekranie.
+
+- [ ] **1.0** Migracja SQL: tabele `clients`, `revenue_items`, `revenue_months` (`SPEC.md` IV.5) — dokładane teraz, bo import ich potrzebuje.
+- [ ] **1.1** Minimalny endpoint API + ekran uploadu: przyjmuje plik `.xlsx`, parsuje strukturalnie (SheetJS) — odczyt kolumn A–I, **dynamiczne wykrywanie zakresu kolumn miesięcznych** (`SPEC.md` II.2, II.4) — **bez walidacji reguł biznesowych na tym etapie**. Ekran pokazuje liczbę odczytanych wersów i wykryty zakres miesięcy. Parser jako czysta funkcja w `lib/`, bez dostępu do bazy. Testy. **Testowalne ręcznie od razu.**
+- [ ] **1.2** Walidacja struktury: układ kolumn, format numeru dokumentu `TYP/rrrr/mm/nnnn`, format kwot, puste komórki miesięcy jako 0. Testy do każdej reguły. Błędy widoczne na ekranie uploadu.
 - [ ] **1.3** Walidacja typów dokumentów (`SPEC.md` II.3.h) i reguł flag (II.3.a–f): dokładnie jedna flaga, FKS bez flag, FVZK tylko H lub I, FKS z wartościami ujemnymi. Testy.
 - [ ] **1.4** Walidacja spójności flag F/G — okno 12 miesięcy per NIP z regułą horyzontu (`SPEC.md` II.3.g). **Najtrudniejsza reguła w projekcie.** Osobna sesja, testy dla obu stron granicy: powrót po 11 miesiącach (błąd) i po 13 (poprawne), oraz flaga G na początku horyzontu (poprawne).
-- [ ] **1.5** Raport błędów: wszystkie problemy jednocześnie, każdy z numerem wersu i przyczyną, komunikaty po polsku (`SPEC.md` VI.4).
+- [ ] **1.5** Ujednolicenie raportu błędów: wszystkie problemy jednocześnie, każdy z numerem wersu i przyczyną, komunikaty po polsku (`SPEC.md` VI.4).
 - [ ] **1.6** Zapis do bazy: import całościowy zastępujący stan, metryki importu, aktualizacja słownika klientów (nowi klienci z typem „nieokreślony").
-- [ ] **1.7** Endpoint API + minimalny ekran uploadu. Test end-to-end: plik syntetyczny wchodzi, plik z błędami jest odrzucany z czytelnym raportem.
+- [ ] **1.7** Domknięcie ekranu uploadu: historia importów, pełny raport błędów, integracja z ekranem z zadania 0.4b. Test end-to-end: plik syntetyczny wchodzi, plik z błędami jest odrzucany z czytelnym raportem.
 
 **Kryterium ukończenia:** na produkcji importuję plik syntetyczny i widzę dane w panelu Supabase. Importuję plik z błędami i dostaję listę wszystkich błędów z numerami wersów. Import tego samego pliku dwukrotnie daje identyczny stan bazy.
 
