@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/service-role";
 import { signOut } from "./actions";
+import { UploadForm } from "./UploadForm";
 
 export default async function Home() {
   const supabase = await createServerSupabaseClient();
@@ -29,6 +30,8 @@ export default async function Home() {
           </button>
         </form>
       </div>
+
+      <UploadForm />
 
       <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h1 className="mb-4 text-lg font-semibold text-gray-900">Historia importów</h1>
