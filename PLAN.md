@@ -22,7 +22,7 @@ Cel: działający publiczny link i wszystko, co potrzebne, żeby dalej pisać ju
 - [x] **0.6** Supabase Auth: strona logowania, middleware blokujący wszystkie pozostałe ścieżki, rejestracja samodzielna wyłączona. Konto właściciela.
 - [x] **0.4b** Prosty ekran podglądu (po zalogowaniu) czytający z tabeli `imports` — potwierdzenie, że przeglądarka → API → baza działają razem, zanim dołożymy kolejne tabele.
 - [x] **0.7** **Generator danych syntetycznych** (`scripts/generate-synthetic-data.ts`) produkujący plik `.xlsx` zgodny z `SPEC.md` II — dane oczywiście fikcyjne, z wszystkimi przypadkami brzegowymi z `SPEC.md` VI.9. Dwa tryby: `npm run generate:data` (czyste dane, do demo) i `npm run generate:data -- --with-errors` (golden file z celowymi błędami, do testów). Wyniki w `test-data/`.
-- [ ] **0.8** Plik testowy z prawdziwej struktury: rzeczywisty wycinek danych, z podmienionymi danymi 3 klientów objętych NDA (`SPEC.md` V.25) — **do użytku wyłącznie lokalnego**, w `local-data/` (gitignored), nigdy commitowany. Potrzebny do backtestu w Etapie 2.
+- [x] **0.8** Plik testowy z prawdziwej struktury: rzeczywisty wycinek danych, z podmienionymi danymi 3 klientów objętych NDA (`SPEC.md` V.25) — **do użytku wyłącznie lokalnego**, w `local-data/` (gitignored), nigdy commitowany. Potrzebny do backtestu w Etapie 2. → `local-data/Sprzedaz.xlsx`
 
 **Kryterium ukończenia:** wchodzę na publiczny link, loguję się, widzę ekran podglądu importów (na razie pusty). `npm test` przechodzi. Mam plik syntetyczny i plik do backtestu.
 
