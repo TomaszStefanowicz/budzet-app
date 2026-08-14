@@ -1,0 +1,69 @@
+{
+  "tryb": "with-errors",
+  "liczbaWersow": 1134,
+  "liczbaKlientowMasowych": 500,
+  "zakresMiesiecyDanych": "2024/01 - 2027/12",
+  "zakresWystawianiaFaktur": "2024/01 - 2026/06",
+  "przypadkiBrzegowe": [
+    {
+      "name": "Przykładowa Firma - Korekta FKS",
+      "nip": "1000000012",
+      "description": "Faktura FVS (F, 12 mies.) + korekta FKS niwelująca ją w całości.",
+      "expectedOutcome": "poprawny import; suma F + korekty = 0 dla tego klienta"
+    },
+    {
+      "name": "Przykładowa Firma - FVZK",
+      "nip": "1000000029",
+      "description": "Faktura zaliczkowa końcowa (FVZK) z flagą incydentalny (I).",
+      "expectedOutcome": "poprawny import"
+    },
+    {
+      "name": "Przykładowa Firma - Powrot po 13 miesiacach (F)",
+      "nip": "1000000035",
+      "description": "Pierwszy dostęp 12 mies., przerwa 13 miesięcy, powrót z flagą F.",
+      "expectedOutcome": "poprawny import (gap 13 > 12 -> F poprawne)"
+    },
+    {
+      "name": "Przykładowa Firma - Powrot po 11 miesiacach (G)",
+      "nip": "1000000041",
+      "description": "Pierwszy dostęp 12 mies., przerwa 11 miesięcy, powrót z flagą G.",
+      "expectedOutcome": "poprawny import (gap 11 <= 12 -> G poprawne)"
+    },
+    {
+      "name": "Przykładowa Firma - Granica horyzontu danych",
+      "nip": "1000000058",
+      "description": "Pakiet 12 mies. kończący się dokładnie w ostatnim miesiącu danych (2027/12).",
+      "expectedOutcome": "poprawny import; zestawienie 13 NIE zgłasza tego klienta jako wygasającego w ostatnim miesiącu danych (brak kolumny M+1)"
+    },
+    {
+      "name": "Przykładowa Firma - Brak flagi (blad)",
+      "nip": "1000000064",
+      "description": "Wers FVS bez żadnej flagi F/G/H/I.",
+      "expectedOutcome": "import odrzucony w całości (SPEC.md II.3.b)"
+    },
+    {
+      "name": "Przykładowa Firma - Dwie flagi (blad)",
+      "nip": "1000000070",
+      "description": "Wers FVS z dwiema flagami (F i G) jednocześnie.",
+      "expectedOutcome": "import odrzucony w całości (SPEC.md II.3.b)"
+    },
+    {
+      "name": "Przykładowa Firma - Nieznany typ dokumentu (blad)",
+      "nip": "1000000087",
+      "description": "Wers z nieznanym typem dokumentu (XYZ zamiast FVS/FKS/FVZ/FVZK).",
+      "expectedOutcome": "import odrzucony w całości (SPEC.md II.3.h)"
+    },
+    {
+      "name": "Przykładowa Firma - Powrot po 11 miesiacach bledny F (blad)",
+      "nip": "1000000093",
+      "description": "Powrót po 11 miesiącach błędnie oznaczony jako F (powinno być G).",
+      "expectedOutcome": "import odrzucony w całości (SPEC.md II.3.g.i)"
+    },
+    {
+      "name": "Przykładowa Firma - Powrot po 13 miesiacach bledny G (blad)",
+      "nip": "1000000118",
+      "description": "Powrót po 13 miesiącach błędnie oznaczony jako G (powinno być F).",
+      "expectedOutcome": "import odrzucony w całości (SPEC.md II.3.g.ii)"
+    }
+  ]
+}

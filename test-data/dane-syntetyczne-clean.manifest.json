@@ -1,0 +1,39 @@
+{
+  "tryb": "clean",
+  "liczbaWersow": 1127,
+  "liczbaKlientowMasowych": 500,
+  "zakresMiesiecyDanych": "2024/01 - 2027/12",
+  "zakresWystawianiaFaktur": "2024/01 - 2026/06",
+  "przypadkiBrzegowe": [
+    {
+      "name": "Przykładowa Firma - Korekta FKS",
+      "nip": "1000000012",
+      "description": "Faktura FVS (F, 12 mies.) + korekta FKS niwelująca ją w całości.",
+      "expectedOutcome": "poprawny import; suma F + korekty = 0 dla tego klienta"
+    },
+    {
+      "name": "Przykładowa Firma - FVZK",
+      "nip": "1000000029",
+      "description": "Faktura zaliczkowa końcowa (FVZK) z flagą incydentalny (I).",
+      "expectedOutcome": "poprawny import"
+    },
+    {
+      "name": "Przykładowa Firma - Powrot po 13 miesiacach (F)",
+      "nip": "1000000035",
+      "description": "Pierwszy dostęp 12 mies., przerwa 13 miesięcy, powrót z flagą F.",
+      "expectedOutcome": "poprawny import (gap 13 > 12 -> F poprawne)"
+    },
+    {
+      "name": "Przykładowa Firma - Powrot po 11 miesiacach (G)",
+      "nip": "1000000041",
+      "description": "Pierwszy dostęp 12 mies., przerwa 11 miesięcy, powrót z flagą G.",
+      "expectedOutcome": "poprawny import (gap 11 <= 12 -> G poprawne)"
+    },
+    {
+      "name": "Przykładowa Firma - Granica horyzontu danych",
+      "nip": "1000000058",
+      "description": "Pakiet 12 mies. kończący się dokładnie w ostatnim miesiącu danych (2027/12).",
+      "expectedOutcome": "poprawny import; zestawienie 13 NIE zgłasza tego klienta jako wygasającego w ostatnim miesiącu danych (brak kolumny M+1)"
+    }
+  ]
+}
