@@ -86,12 +86,15 @@ i) **[UZUPEŁNIENIE] Klasyfikacja błędów.** Wszystkie błędy z pkt II.3 (bra
 ### 4. Plik importowy
 
 Do aplikacji importowany jest zawsze osobny plik przygotowany metodą kopiuj-wklej (tylko wartości, bez formuł) z arkusza „Sprzedaż", o sztywnym układzie:
+- dokładnie jeden wiersz nagłówkowy nad danymi,
 - kolumny A–I zgodnie z pkt II.2,
 - kolumny miesięcy od kolumny J (styczeń 2024), kolejne miesiące w kolejnych kolumnach bez przerw,
 - liczba kolumn miesięcy jest zmienna i rośnie w czasie — **aplikacja wykrywa zakres miesięcy dynamicznie, nie zakłada ostatniej kolumny**,
 - kwoty: PLN netto, format liczbowy 0,00.
 
 **[UZUPEŁNIENIE] Format pliku:** `.xlsx` (nie CSV). Uzasadnienie: eliminuje problem polskiego separatora dziesiętnego i kodowania znaków, oraz skraca ścieżkę użytkownika o krok konwersji. Puste komórki w kolumnach miesięcy traktowane są jako 0.
+
+**[UZUPEŁNIENIE] Liczba wierszy nagłówkowych: zawsze dokładnie jeden.** Arkusz źródłowy „Sprzedaż" ma nad kolumnami miesięcy dwa scalone wiersze nagłówkowe (rok, potem miesiąc). Przy przygotowywaniu pliku importowego (kopiuj-wklej) redukowane są one zawsze do jednego prostego wiersza z nazwami kolumn — nigdy zera, nigdy dwóch. Uzasadnienie: przypisanie kolumn miesięcy do konkretnych miesięcy jest i tak wyłącznie pozycyjne (kolumna J = styczeń 2024, dalej kolejno bez przerw) — treść nagłówka nad kolumnami miesięcy nigdy nie jest parsowana programowo, służy wyłącznie człowiekowi. Liczba wierszy nagłówkowych musi być jednak stała, żeby parser mógł deterministycznie pominąć wiersz nagłówkowy przed odczytem danych, bez zgadywania.
 
 ---
 
@@ -265,6 +268,8 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 
 22. **[UZUPEŁNIENIE] Z Supabase wykorzystywane są wyłącznie: Postgres, Auth, panel podglądu** — świadome ograniczenie zakresu przy dwutygodniowym terminie.
 
+23. **[UZUPEŁNIENIE] Plik importowy ma zawsze dokładnie jeden wiersz nagłówkowy** — arkusz źródłowy „Sprzedaż" ma nad kolumnami miesięcy dwa scalone wiersze nagłówkowe (rok, potem miesiąc), a liczba wierszy nagłówkowych w pliku przygotowywanym do importu (kopiuj-wklej) zależała dotąd od decyzji osoby przygotowującej plik (0, 1 lub 2). Ustalono sztywno: zawsze jeden. Przypisanie kolumn do miesięcy jest i tak wyłącznie pozycyjne (II.4), więc treść nagłówka nad kolumnami miesięcy nie ma znaczenia dla obliczeń — ale jego liczba musi być stała, żeby import pozostał deterministyczny. Rozstrzyga otwarte pytanie P2 z `PLAN.md`.
+
 ---
 
 ## VI. [UZUPEŁNIENIE] Wymagania niefunkcjonalne
@@ -353,6 +358,7 @@ Instancja produkcyjna to osobny projekt Vercel + osobny projekt Supabase, ten sa
 5. **II.4** — format pliku importowego: `.xlsx`.
 6. **IV.5** — zarys modelu danych.
 7. **Sekcja VI** — całość wymagań niefunkcjonalnych: hosting, autoryzacja, rozdział instancji demo/produkcyjnej, eksport, precyzja liczbowa, wydajność, bezpieczeństwo, jakość, zakres poza MVP.
-8. **V.15–22** — decyzje projektowe wynikające z powyższych uzupełnień.
+8. **II.4** — liczba wierszy nagłówkowych pliku importowego (zawsze dokładnie jeden), rozstrzygnięcie otwartego pytania `PLAN.md` P2.
+9. **V.15–23** — decyzje projektowe wynikające z powyższych uzupełnień.
 
 **Redakcja:** treść merytoryczna sekcji I–V zachowana; ujednolicono formatowanie, poprawiono literówki, ponumerowano procedury referencyjne.

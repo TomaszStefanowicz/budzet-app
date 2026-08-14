@@ -84,7 +84,7 @@ Cel: serce aplikacji. To tu kryje się największe ryzyko z decyzji V.5 — „p
 Do rozstrzygnięcia w trakcie; każde rozstrzygnięcie dopisujemy do rejestru decyzji w `SPEC.md`.
 
 - [ ] **P1** Czy zestawienia mają być liczone na żądanie, czy zapisywane do archiwum przy imporcie? (Wpływa na 4.1. Rekomendacja: liczone na żądanie, archiwum jako zapis migawki.)
-- [ ] **P2** Czy pierwszy wers pliku to zawsze nagłówek z nazwami miesięcy w formacie rozpoznawalnym maszynowo? Jeśli nie — zakres miesięcy trzeba wykrywać po pozycji kolumny J = styczeń 2024 i liczyć w przód.
+- [x] **P2** Czy pierwszy wers pliku to zawsze nagłówek z nazwami miesięcy w formacie rozpoznawalnym maszynowo? Jeśli nie — zakres miesięcy trzeba wykrywać po pozycji kolumny J = styczeń 2024 i liczyć w przód. → **Rozstrzygnięte:** plik importowy ma zawsze dokładnie jeden wiersz nagłówkowy; zakres miesięcy wykrywany wyłącznie pozycyjnie (patrz `SPEC.md` V.23).
 - [ ] **P3** Co z klientem, który zmienił NIP (przekształcenie spółki)? Dziś: dwaj różni klienci. Czy to akceptowalne?
 - [ ] **P4** Czy w zestawieniu 13 interesują Cię tylko wygaśnięcia w oknie „bieżący miesiąc + 3", czy dowolny miesiąc historyczny do analizy?
 - [ ] **P5** Czy eksport `.xlsx` ma odwzorowywać układ dotychczasowych sprawozdań dla funduszy, czy wystarczy surowa tabela?
