@@ -13,7 +13,7 @@ Zadania odhaczamy w trakcie pracy (`[x]`). Każda sesja z Claude Code zaczyna si
 Cel: działający publiczny link i wszystko, co potrzebne, żeby dalej pisać już tylko logikę.
 
 - [x] **0.1** Repozytorium na GitHubie, pierwszy commit z `CLAUDE.md`, `SPEC.md`, `PLAN.md`.
-- [ ] **0.2** Szkielet Next.js + TypeScript, konfiguracja Vitest, `.gitignore` z `.env.local`.
+- [x] **0.2** Szkielet Next.js + TypeScript, konfiguracja Vitest, `.gitignore` z `.env.local`.
 - [ ] **0.3** Projekt Supabase, podpięcie do Vercela, zmienne środowiskowe.
 - [ ] **0.4** Pierwsza migracja SQL w `supabase/migrations/` — tabele wg `SPEC.md` IV.5. Struktura bazy powstaje z pliku, nie z panelu.
 - [ ] **0.5** Deploy na Vercel z gałęzi `main`. **Publiczny link musi działać.**
