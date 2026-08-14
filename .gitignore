@@ -43,3 +43,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# dane lokalne (zadanie 0.8 z PLAN.md) - zanonimizowany wycinek rzeczywistych danych
+# do backtestu, wyłącznie lokalnie, NIGDY nie commitowany (SPEC.md V.18)
+/local-data/
