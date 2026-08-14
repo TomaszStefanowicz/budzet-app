@@ -21,7 +21,7 @@ Cel: działający publiczny link i wszystko, co potrzebne, żeby dalej pisać ju
 - [x] **0.5** Deploy na Vercel z gałęzi `main`. **Publiczny link musi działać.** → https://budzet-app-sigma.vercel.app
 - [x] **0.6** Supabase Auth: strona logowania, middleware blokujący wszystkie pozostałe ścieżki, rejestracja samodzielna wyłączona. Konto właściciela.
 - [x] **0.4b** Prosty ekran podglądu (po zalogowaniu) czytający z tabeli `imports` — potwierdzenie, że przeglądarka → API → baza działają razem, zanim dołożymy kolejne tabele.
-- [ ] **0.7** **Generator danych syntetycznych** (skrypt w repo, nie jednorazowy plik) produkujący plik `.xlsx` zgodny z `SPEC.md` II — dane oczywiście fikcyjne, z wszystkimi przypadkami brzegowymi z `SPEC.md` VI.9. To jednocześnie „golden file" do testów i zbiór demo dla organizatorów.
+- [x] **0.7** **Generator danych syntetycznych** (`scripts/generate-synthetic-data.ts`) produkujący plik `.xlsx` zgodny z `SPEC.md` II — dane oczywiście fikcyjne, z wszystkimi przypadkami brzegowymi z `SPEC.md` VI.9. Dwa tryby: `npm run generate:data` (czyste dane, do demo) i `npm run generate:data -- --with-errors` (golden file z celowymi błędami, do testów). Wyniki w `test-data/`.
 - [ ] **0.8** Plik testowy z prawdziwej struktury: zanonimizowany wycinek rzeczywistych danych **do użytku wyłącznie lokalnego**, nigdy commitowany. Potrzebny do backtestu w Etapie 2.
 
 **Kryterium ukończenia:** wchodzę na publiczny link, loguję się, widzę ekran podglądu importów (na razie pusty). `npm test` przechodzi. Mam plik syntetyczny i plik do backtestu.
