@@ -15,13 +15,16 @@ Cel: działający publiczny link i wszystko, co potrzebne, żeby dalej pisać ju
 - [x] **0.1** Repozytorium na GitHubie, pierwszy commit z `CLAUDE.md`, `SPEC.md`, `PLAN.md`.
 - [x] **0.2** Szkielet Next.js + TypeScript, konfiguracja Vitest, `.gitignore` z `.env.local`.
 - [x] **0.3** Projekt Supabase, podpięcie do Vercela, zmienne środowiskowe.
-- [ ] **0.4** Pierwsza migracja SQL w `supabase/migrations/` — tabele wg `SPEC.md` IV.5. Struktura bazy powstaje z pliku, nie z panelu.
+**[UZUPEŁNIENIE] Zadanie 0.4 rozbite na mniejsze kroki (podejście „chodzący szkielet")** — zamiast jednej migracji ze wszystkimi tabelami z `SPEC.md` IV.5 na raz, budujemy jedną cienką, ale kompletną ścieżkę (baza → logowanie → ekran podglądu) i dopiero sprawdzoną rozszerzamy. Pozostałe tabele (`clients`, `revenue_items`, `revenue_months`) powstają w Etapie 1, gdy import faktycznie ich potrzebuje; `report_archive` — w Etapie 4.
+
+- [x] **0.4a** Migracja SQL: tabela `imports` (metryki importu — data, nazwa pliku, liczba wersów, wynik walidacji, zakres wykrytych miesięcy). Struktura bazy powstaje z pliku, nie z panelu.
 - [x] **0.5** Deploy na Vercel z gałęzi `main`. **Publiczny link musi działać.** → https://budzet-app-sigma.vercel.app
 - [ ] **0.6** Supabase Auth: strona logowania, middleware blokujący wszystkie pozostałe ścieżki, rejestracja samodzielna wyłączona. Konto właściciela.
-- [ ] **0.7** **Generator danych syntetycznych** (skrypt w repo) produkujący plik `.xlsx` zgodny z `SPEC.md` II — dane oczywiście fikcyjne, z wszystkimi przypadkami brzegowymi z `SPEC.md` VI.9. To jednocześnie „golden file" do testów i zbiór demo dla organizatorów.
+- [ ] **0.4b** Prosty ekran podglądu (po zalogowaniu) czytający z tabeli `imports` — potwierdzenie, że przeglądarka → API → baza działają razem, zanim dołożymy kolejne tabele.
+- [ ] **0.7** **Generator danych syntetycznych** (skrypt w repo, nie jednorazowy plik) produkujący plik `.xlsx` zgodny z `SPEC.md` II — dane oczywiście fikcyjne, z wszystkimi przypadkami brzegowymi z `SPEC.md` VI.9. To jednocześnie „golden file" do testów i zbiór demo dla organizatorów.
 - [ ] **0.8** Plik testowy z prawdziwej struktury: zanonimizowany wycinek rzeczywistych danych **do użytku wyłącznie lokalnego**, nigdy commitowany. Potrzebny do backtestu w Etapie 2.
 
-**Kryterium ukończenia:** wchodzę na publiczny link, loguję się, widzę pustą aplikację. `npm test` przechodzi. Mam plik syntetyczny i plik do backtestu.
+**Kryterium ukończenia:** wchodzę na publiczny link, loguję się, widzę ekran podglądu importów (na razie pusty). `npm test` przechodzi. Mam plik syntetyczny i plik do backtestu.
 
 ---
 
@@ -29,6 +32,7 @@ Cel: działający publiczny link i wszystko, co potrzebne, żeby dalej pisać ju
 
 Cel: serce aplikacji. To tu kryje się największe ryzyko z decyzji V.5 — „policzy błędnie, ale wiarygodnie".
 
+- [ ] **1.0** Migracja SQL: tabele `clients`, `revenue_items`, `revenue_months` (`SPEC.md` IV.5) — dokładane teraz, bo import ich potrzebuje (patrz `UZUPEŁNIENIE` w Etapie 0 o rozbiciu 0.4).
 - [ ] **1.1** Parser `.xlsx` (SheetJS): odczyt kolumn A–I, **dynamiczne wykrywanie zakresu kolumn miesięcznych** (`SPEC.md` II.2, II.4). Czysta funkcja w `lib/`, bez dostępu do bazy. Testy.
 - [ ] **1.2** Walidacja struktury: układ kolumn, format numeru dokumentu `TYP/rrrr/mm/nnnn`, format kwot, puste komórki miesięcy jako 0. Testy do każdej reguły.
 - [ ] **1.3** Walidacja typów dokumentów (`SPEC.md` II.3.h) i reguł flag (II.3.a–f): dokładnie jedna flaga, FKS bez flag, FVZK tylko H lub I, FKS z wartościami ujemnymi. Testy.
@@ -69,7 +73,7 @@ Cel: serce aplikacji. To tu kryje się największe ryzyko z decyzji V.5 — „p
 
 ## Etap 4 — Domknięcie i bufor (dni 12–14)
 
-- [ ] **4.1** Archiwum wygenerowanych zestawień (`SPEC.md` IV.3).
+- [ ] **4.1** Archiwum wygenerowanych zestawień (`SPEC.md` IV.3), w tym migracja SQL dla tabeli `report_archive`.
 - [ ] **4.2** Instancja demo: zasilenie danymi syntetycznymi, uzupełniony słownik, wygenerowane zestawienia — organizator po zalogowaniu widzi działający produkt, nie pustą bazę.
 - [ ] **4.3** Konto dla organizatorów kursu.
 - [ ] **4.4** `README.md`: co to jest, link do aplikacji, dane logowania demo, stack, jak uruchomić lokalnie, uwaga o danych syntetycznych.
