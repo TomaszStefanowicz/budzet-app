@@ -294,6 +294,8 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 
 27. **[UZUPEŁNIENIE] Flaga H (dokupienie) nie podlega ograniczeniu liczby miesięcy rozliczeniowych** — w przeciwieństwie do F/G (co najmniej 2 miesiące, II.3.c) i I (dokładnie jeden miesiąc, z definicji w II.2), flaga H może wystąpić zarówno w wersie jednomiesięcznym, jak i wielomiesięcznym. Uzasadnienie: SPEC.md II.3.c wprost ogranicza tylko F/G — milczenie na temat H potraktowano jako świadome pominięcie ograniczenia (dokupienie dodatkowych kont czy modułu może być rozliczane jednorazowo albo w ramach istniejącego pakietu długoterminowego), nie jako przeoczenie specyfikacji. Rozstrzygnięcie potwierdzone z użytkownikiem przy zadaniu 1.3.
 
+28. **[UZUPEŁNIENIE] Flaga I nie uczestniczy w łańcuchu ciągłości dostępu przy walidacji reguły II.3.g** — przy ustalaniu, czy poprzedni dostęp klienta (per NIP) wygasł w oknie 12 miesięcy, pod uwagę brane są wyłącznie wersy z flagą F/G; wersy I (zakup jednorazowy, z definicji w II.2 niezwiązany z dostępem do platformy) i H (dokupienie, nie tworzy/nie resetuje dostępu bazowego) są pomijane. Uzasadnienie: potwierdzone empirycznie na pliku `test-data/dane-syntetyczne-clean.xlsx` — pominięcie flagi I z łańcucha daje zero rozbieżności względem flag faktycznie przypisanych w danych referencyjnych, uwzględnienie jej generowało 55 rozbieżności. **Przy tej samej analizie wykryto i naprawiono błąd w `scripts/generate-synthetic-data.ts`:** generator liczył przerwę między pakietami od końca OSTATNIEGO WERSU w ogóle (w tym incydentalnych), zamiast od końca ostatniego prawdziwego dostępu F/G, co w 22 wersach nadawało flagę G pierwszemu prawdziwemu pakietowi klienta zamiast F (błąd ujawniony dopiero przez tę regułę walidacji — poprzednie zadania 1.1–1.3 nie miały jak go wykryć). Generator poprawiony (śledzi koniec dostępu osobną zmienną, aktualizowaną wyłącznie przez wersy F/G), oba pliki syntetyczne przegenerowane.
+
 ---
 
 ## VI. [UZUPEŁNIENIE] Wymagania niefunkcjonalne
@@ -386,8 +388,9 @@ Instancja produkcyjna to osobny projekt Vercel + osobny projekt Supabase, ten sa
 8. **II.4** — liczba wierszy nagłówkowych pliku importowego (zawsze dokładnie jeden), rozstrzygnięcie otwartego pytania `PLAN.md` P2.
 9. **VI.9** — generator danych syntetycznych w dwóch trybach (`--clean` / `--with-errors`), rozdzielenie golden file od danych demo.
 10. **V.18 (korekta)** — zawężenie zakresu poufności danych sprzedażowych do 3 konkretnych klientów objętych NDA, zamiast całego zbioru danych; patrz nowa decyzja 26.
-11. **V.15–27** — decyzje projektowe wynikające z powyższych uzupełnień.
+11. **V.15–28** — decyzje projektowe wynikające z powyższych uzupełnień.
 12. **II.5, V.25** — szczegółowe reguły walidacji strukturalnej pól (zadanie `PLAN.md` 1.2): ciągłość liczby porządkowej, minimalna długość nazwy klienta, suma kontrolna NIP / kształt VAT UE, wymóg dokładnie jednej flagi F–I z wartością `1`, wymóg niezerowego przychodu w co najmniej jednym miesiącu.
 13. **II.3 (walidacja typu dokumentu i spójności flag), V.27** — zadanie `PLAN.md` 1.3: walidacja typu dokumentu względem listy znanych typów (FVS/FKS/FVZ/FVZK), wymóg flagi H lub I dla FVZK, spójność flagi F/G/I z liczbą miesięcy rozliczeniowych w wersie, rozstrzygnięcie dla flagi H (brak ograniczenia).
+14. **V.28** — zadanie `PLAN.md` 1.4: wykluczenie flagi I (i H) z łańcucha ciągłości dostępu przy walidacji reguły II.3.g, potwierdzone empirycznie; przy okazji naprawiono błąd w `scripts/generate-synthetic-data.ts` (przerwa liczona od ostatniego wersu w ogóle, nie od ostatniego prawdziwego dostępu F/G) i przegenerowano oba pliki syntetyczne.
 
 **Redakcja:** treść merytoryczna sekcji I–V zachowana; ujednolicono formatowanie, poprawiono literówki, ponumerowano procedury referencyjne.

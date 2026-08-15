@@ -169,9 +169,12 @@ function generateBulkClients(rand: RandomFn, count: number, usedNips: Set<string
     const nip = generateRandomNip(rand, usedNips);
     const name = bulkClientName(i);
 
-    const cycles: { startIdx: number; endIdx: number }[] = [];
+    // Tylko wersy F/G wyznaczają "dostęp do platformy" (SPEC.md II.2) - flaga I
+    // to jednorazowy zakup niezwiązany z dostępem i nie może liczyć się do
+    // przerwy między pakietami (SPEC.md II.3.g), dlatego śledzimy koniec
+    // ostatniego dostępu osobno, nie jako "poprzedni wers w ogóle".
+    let lastAccessEnd: number | null = null;
     let currentIdx = randInt(rand, 0, INVOICE_END_IDX);
-    let isFirst = true;
 
     while (currentIdx <= INVOICE_END_IDX) {
       const wantsIncydentalny = rand() < 0.15;
@@ -185,11 +188,10 @@ function generateBulkClients(rand: RandomFn, count: number, usedNips: Set<string
       let flag: "F" | "G" | "H" | "I";
       if (duration === 1) {
         flag = "I";
-      } else if (isFirst) {
+      } else if (lastAccessEnd === null) {
         flag = "F";
       } else {
-        const previousEnd = cycles[cycles.length - 1].endIdx;
-        const gapMonths = currentIdx - previousEnd;
+        const gapMonths = currentIdx - lastAccessEnd;
         flag = gapMonths > 12 ? "F" : "G";
       }
 
@@ -213,8 +215,9 @@ function generateBulkClients(rand: RandomFn, count: number, usedNips: Set<string
         monthlyGrosze: makeMonthly(currentIdx, amounts),
       });
 
-      cycles.push({ startIdx: currentIdx, endIdx });
-      isFirst = false;
+      if (flag === "F" || flag === "G") {
+        lastAccessEnd = endIdx;
+      }
 
       // Dokupienie (H) w trakcie aktywnego okresu - opcjonalnie.
       if (flag !== "I" && rand() < 0.45) {
