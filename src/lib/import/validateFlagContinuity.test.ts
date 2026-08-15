@@ -95,21 +95,20 @@ describe("validateFlagContinuity", () => {
     expect(messages(errors).some((m) => m.includes("powinna być flaga G"))).toBe(true);
   });
 
-  describe("reguła horyzontu danych (SPEC.md II.3.g.3)", () => {
-    it("akceptuje flagę G bez widocznej historii, gdy start jest w pierwszych 12 miesiącach danych", () => {
+  describe("brak widocznej wcześniejszej historii - walidacja niemożliwa, nigdy nie jest błędem (SPEC.md II.3.g.3, skorygowane V.31)", () => {
+    it("akceptuje flagę G bez widocznej historii blisko początku danych", () => {
       const rows = buildRows([{ flag: "G", startIdx: 5, duration: 12 }]);
       expect(validateFlagContinuity(rows)).toEqual([]);
     });
 
-    it("akceptuje flagę G bez historii dokładnie na granicy horyzontu (startIdx == 11)", () => {
-      const rows = buildRows([{ flag: "G", startIdx: 11, duration: 12 }]);
+    it("akceptuje flagę G bez widocznej historii daleko w danych (np. rok 2 pliku)", () => {
+      const rows = buildRows([{ flag: "G", startIdx: 20, duration: 12 }]);
       expect(validateFlagContinuity(rows)).toEqual([]);
     });
 
-    it("odrzuca flagę G bez widocznej historii poza oknem horyzontu (startIdx == 12)", () => {
-      const rows = buildRows([{ flag: "G", startIdx: 12, duration: 12 }]);
-      const errors = validateFlagContinuity(rows);
-      expect(messages(errors).some((m) => m.includes("poza oknem 12 miesięcy"))).toBe(true);
+    it("akceptuje flagę F bez widocznej historii, niezależnie od pozycji w pliku", () => {
+      const rows = buildRows([{ flag: "F", startIdx: 30, duration: 12 }]);
+      expect(validateFlagContinuity(rows)).toEqual([]);
     });
   });
 

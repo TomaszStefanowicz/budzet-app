@@ -31,9 +31,11 @@ function monthSpan(row: unknown[]): { start: number; end: number } | null {
  * Waliduje spójność flag F/G z historią dostępu klienta per NIP (SPEC.md II.3.g).
  * Flaga F wymaga, żeby ewentualny poprzedni dostęp wygasł WIĘCEJ niż 12 miesięcy
  * przed rozpoczęciem rozliczeń tego wersu; flaga G - żeby wygasł co NAJWYŻEJ
- * 12 miesięcy przed. Reguła horyzontu (II.3.g.3) toleruje flagę G bez widocznej
- * historii, jeśli rozliczenia zaczynają się w pierwszych 12 miesiącach danych
- * (poprzedni dostęp mógł wygasnąć przed horyzontem, poza zasięgiem pliku).
+ * 12 miesięcy przed. Weryfikacja dotyczy wyłącznie przypadków, gdy wcześniejszy
+ * dostęp jest w ogóle widoczny w danych (SPEC.md II.3.g.3, skorygowane V.31) -
+ * skoro rzeczywista historia klienta może sięgać poza początek pliku w sposób
+ * niemożliwy do oszacowania (dane sprzed migracji spółki), pierwszy widoczny
+ * wers F/G danego NIP nigdy nie jest błędem, niezależnie od jego pozycji w pliku.
  *
  * Flaga I jest celowo pomijana - z definicji (SPEC.md II.2) to zakup jednorazowy
  * niegenerujący stałego strumienia przychodów, niezwiązany z dostępem do
@@ -74,16 +76,9 @@ export function validateFlagContinuity(rawRows: unknown[][]): StructuralValidati
     entries.sort((a, b) => a.startIdx - b.startIdx);
 
     entries.forEach((entry, idx) => {
-      if (idx === 0) {
-        if (entry.flag === "G" && entry.startIdx >= HORIZON_MONTHS) {
-          errors.push({
-            sourceRowNumber: entry.sourceRowNumber,
-            message:
-              "Flaga G bez widocznej wcześniejszej historii dostępu dla tego NIP, poza oknem 12 miesięcy od początku danych (SPEC.md II.3.g).",
-          });
-        }
-        return;
-      }
+      if (idx === 0) return; // brak widocznego wcześniejszego dostępu - walidacja niemożliwa, nigdy nie jest to błąd
+
+
 
       const previousEnd = entries[idx - 1].endIdx;
       const gapMonths = entry.startIdx - previousEnd;

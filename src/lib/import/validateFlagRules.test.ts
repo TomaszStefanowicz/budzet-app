@@ -40,15 +40,15 @@ describe("validateDocumentAndFlagRules", () => {
     });
   });
 
-  describe("FVZK - wyłącznie flaga H lub I (SPEC.md II.3.e)", () => {
+  describe("FVZK - nigdy flaga F, dozwolone G/H/I (SPEC.md II.3.e, skorygowane V.30)", () => {
     it("odrzuca FVZK z flagą F", () => {
       const errors = validateDocumentAndFlagRules([HEADER, row({ 3: "FVZK/2024/01/0001", 5: 1 })]);
-      expect(messagesFor(2, errors).some((m) => m.includes("FVZK") && m.includes("H lub I"))).toBe(true);
+      expect(messagesFor(2, errors).some((m) => m.includes("FVZK") && m.includes("nie może mieć flagi F"))).toBe(true);
     });
 
-    it("odrzuca FVZK z flagą G", () => {
-      const errors = validateDocumentAndFlagRules([HEADER, row({ 3: "FVZK/2024/01/0001", 6: 1 })]);
-      expect(messagesFor(2, errors).some((m) => m.includes("FVZK") && m.includes("H lub I"))).toBe(true);
+    it("akceptuje FVZK z flagą G", () => {
+      const errors = validateDocumentAndFlagRules([HEADER, row({ 3: "FVZK/2024/01/0001", 6: 1, 5: null })]);
+      expect(errors).toEqual([]);
     });
 
     it("akceptuje FVZK z flagą H", () => {
@@ -62,10 +62,15 @@ describe("validateDocumentAndFlagRules", () => {
     });
   });
 
-  describe("flaga F/G wymaga co najmniej 2 miesięcy (SPEC.md II.3.c)", () => {
-    it("odrzuca flagę F z rozliczeniem tylko w jednym miesiącu", () => {
+  describe("flaga F/G - brak ograniczenia liczby miesięcy (SPEC.md II.3.c, skorygowane V.29)", () => {
+    it("akceptuje flagę F z rozliczeniem tylko w jednym miesiącu", () => {
       const errors = validateDocumentAndFlagRules([HEADER, row({ 5: 1, 9: 1200, 10: null })]);
-      expect(messagesFor(2, errors).some((m) => m.includes("co najmniej 2 miesiącach"))).toBe(true);
+      expect(errors).toEqual([]);
+    });
+
+    it("akceptuje flagę G z rozliczeniem tylko w jednym miesiącu", () => {
+      const errors = validateDocumentAndFlagRules([HEADER, row({ 6: 1, 5: null, 9: 1200, 10: null })]);
+      expect(errors).toEqual([]);
     });
 
     it("akceptuje flagę G z rozliczeniem w dwóch miesiącach", () => {

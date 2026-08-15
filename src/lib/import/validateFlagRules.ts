@@ -27,9 +27,14 @@ function getSingleFlag(row: unknown[]): string | null {
 
 /**
  * Waliduje typ dokumentu (SPEC.md II.3.h) oraz spójność flagi z typem dokumentu
- * i liczbą miesięcy rozliczeniowych w wersie (SPEC.md II.3.c, II.3.e). Zakłada,
- * że kształt danych (format numeru dokumentu, dokładnie jedna flaga) jest już
- * sprawdzony przez validateFileStructure - tu tylko warstwa semantyczna.
+ * (SPEC.md II.3.e - FVZK nigdy F, skorygowane V.30) i długością rozliczenia dla flagi I
+ * (SPEC.md II.2 - dokładnie jeden miesiąc). Zakłada, że kształt danych (format
+ * numeru dokumentu, dokładnie jedna flaga) jest już sprawdzony przez
+ * validateFileStructure - tu tylko warstwa semantyczna.
+ *
+ * Długość rozliczenia NIE jest sprawdzana dla flag F/G (SPEC.md II.3.c,
+ * skorygowane V.29) - dostęp podstawowy bywa rozliczany też miesięcznie,
+ * rozróżnienie F/G vs I opiera się wyłącznie na fladze z pliku źródłowego.
  */
 export function validateDocumentAndFlagRules(rawRows: unknown[][]): StructuralValidationError[] {
   const errors: StructuralValidationError[] = [];
@@ -55,25 +60,21 @@ export function validateDocumentAndFlagRules(rawRows: unknown[][]): StructuralVa
     const flag = getSingleFlag(row);
     if (flag === null) return; // brak/wielokrotność flagi już zgłoszona przez validateFileStructure
 
-    if (documentType === "FVZK" && flag !== "H" && flag !== "I") {
+    if (documentType === "FVZK" && flag === "F") {
       errors.push({
         sourceRowNumber,
-        message: `Faktura zaliczkowa końcowa (FVZK) może mieć wyłącznie flagę H lub I, znaleziono ${flag}.`,
+        message: "Faktura zaliczkowa końcowa (FVZK) nie może mieć flagi F (SPEC.md II.3.e) — dozwolone G, H lub I.",
       });
     }
 
-    const nonZeroMonths = countNonZeroMonths(row);
-    if ((flag === "F" || flag === "G") && nonZeroMonths < 2) {
-      errors.push({
-        sourceRowNumber,
-        message: `Flaga ${flag} wymaga rozliczenia w co najmniej 2 miesiącach — pakiety jednomiesięczne muszą być oznaczone jako I (SPEC.md II.3.c).`,
-      });
-    }
-    if (flag === "I" && nonZeroMonths !== 1) {
-      errors.push({
-        sourceRowNumber,
-        message: `Flaga I (zakup incydentalny) wymaga rozliczenia w dokładnie jednym miesiącu, znaleziono ${nonZeroMonths}.`,
-      });
+    if (flag === "I") {
+      const nonZeroMonths = countNonZeroMonths(row);
+      if (nonZeroMonths !== 1) {
+        errors.push({
+          sourceRowNumber,
+          message: `Flaga I (zakup incydentalny) wymaga rozliczenia w dokładnie jednym miesiącu, znaleziono ${nonZeroMonths}.`,
+        });
+      }
     }
   });
 
