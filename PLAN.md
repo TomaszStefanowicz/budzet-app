@@ -103,4 +103,4 @@ Krótkie notatki po każdej sesji: co zrobione, co zaskoczyło, co wymagało pop
 
 | Dzień | Etap / zadanie | Notatka |
 |---|---|---|
-| | | |
+| 2026-08-15 | 1.2 | Utrata dostępu do konta właściciela (zgubione hasło, Site URL w Supabase Auth wskazywał na localhost — reset hasła prowadził donikąd). Naprawiono ustawienie Site URL, stare konto usunięto, założono nowe. Przy okazji implementacji walidacji struktury dopisano do SPEC.md (II.5, V.26) reguły doprecyzowane z użytkownikiem (m.in. suma kontrolna NIP, wymóg wartości `1` we fladze). Test ujawnił błąd we własnej regule walidacji VAT UE (akceptowała czyste litery zamiast wymagać cyfr) — poprawiono przed pushem. |
