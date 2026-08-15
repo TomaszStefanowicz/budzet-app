@@ -8,9 +8,15 @@ interface UploadResult {
   monthRange: { fromYear: number; fromMonth: number; toYear: number; toMonth: number } | null;
 }
 
+interface StructuralValidationError {
+  sourceRowNumber: number;
+  message: string;
+}
+
 export function UploadForm() {
   const [result, setResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<StructuralValidationError[]>([]);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -22,6 +28,7 @@ export function UploadForm() {
 
     setLoading(true);
     setError(null);
+    setValidationErrors([]);
     setResult(null);
 
     const formData = new FormData();
@@ -29,6 +36,12 @@ export function UploadForm() {
 
     const response = await fetch("/api/import", { method: "POST", body: formData });
     setLoading(false);
+
+    if (response.status === 422) {
+      const body = await response.json().catch(() => ({ errors: [] }));
+      setValidationErrors(body.errors ?? []);
+      return;
+    }
 
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
@@ -55,6 +68,22 @@ export function UploadForm() {
       </form>
 
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+
+      {validationErrors.length > 0 && (
+        <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3">
+          <p className="mb-2 text-sm font-medium text-red-700">
+            Plik odrzucony w całości — znaleziono {validationErrors.length}{" "}
+            {validationErrors.length === 1 ? "błąd" : "błędów"}:
+          </p>
+          <ul className="max-h-64 space-y-1 overflow-y-auto text-sm text-red-700">
+            {validationErrors.map((e, i) => (
+              <li key={i}>
+                Wers {e.sourceRowNumber}: {e.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {result && (
         <div className="mt-3 text-sm text-gray-700">
