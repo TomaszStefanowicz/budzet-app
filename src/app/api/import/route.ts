@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { parseWorkbookBuffer } from "@/lib/import/parseWorkbook";
 import { parseSalesRows } from "@/lib/import/parseSalesRows";
 import { validateFileStructure } from "@/lib/import/validateStructure";
+import { validateDocumentAndFlagRules } from "@/lib/import/validateFlagRules";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -18,9 +19,9 @@ export async function POST(request: Request) {
   const buffer = await file.arrayBuffer();
   const rawRows = parseWorkbookBuffer(buffer);
 
-  const structuralErrors = validateFileStructure(rawRows);
-  if (structuralErrors.length > 0) {
-    return NextResponse.json({ fileName: file.name, errors: structuralErrors }, { status: 422 });
+  const errors = [...validateFileStructure(rawRows), ...validateDocumentAndFlagRules(rawRows)];
+  if (errors.length > 0) {
+    return NextResponse.json({ fileName: file.name, errors }, { status: 422 });
   }
 
   const { rows, monthRange } = parseSalesRows(rawRows);

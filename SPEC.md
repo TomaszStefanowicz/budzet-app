@@ -98,7 +98,7 @@ Do aplikacji importowany jest zawsze osobny plik przygotowany metodą kopiuj-wkl
 
 ### 5. [UZUPEŁNIENIE] Walidacja strukturalna pól (PLAN.md 1.2)
 
-Każdy wers podlega poniższym regułom kształtu danych, niezależnie od walidacji typów dokumentów i reguł semantycznych flag opisanych w pkt II.3 (decyzja V.26 precyzuje rozstrzygnięcia podjęte przy tym zadaniu):
+Każdy wers podlega poniższym regułom kształtu danych, niezależnie od walidacji typów dokumentów i reguł semantycznych flag opisanych w pkt II.3 (decyzja V.25 precyzuje rozstrzygnięcia podjęte przy tym zadaniu):
 
 a) Kolumny A–E nie mogą być puste.
 b) **Kolumna A (liczba porządkowa):** liczba całkowita, rosnąca kolejno o dokładnie 1 względem poprzedniego wersu. Wartość startowa dowolna — plik importowy bywa wycinkiem z większego arkusza, nie musi zaczynać się od 1.
@@ -274,7 +274,7 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 
 17. **[UZUPEŁNIENIE] Hosting publiczny wymaga autoryzacji jako elementu MVP** — aplikacja przetwarza dane finansowe; brak logowania byłby błędem konstrukcyjnym, nie brakiem funkcji.
 
-18. **[UZUPEŁNIENIE] Rozdział instancji demo i produkcyjnej** — instancja udostępniana organizatorom kursu pracuje wyłącznie na danych syntetycznych. Uzasadnienie: prostota rozdziału i brak potrzeby publicznego ujawniania rzeczywistych wyników sprzedażowych — niezależnie od tego, czy dany klient jest objęty poufnością (patrz decyzja 27, która precyzuje, że poufność per klient to osobna, węższa sprawa).
+18. **[UZUPEŁNIENIE] Rozdział instancji demo i produkcyjnej** — instancja udostępniana organizatorom kursu pracuje wyłącznie na danych syntetycznych. Uzasadnienie: prostota rozdziału i brak potrzeby publicznego ujawniania rzeczywistych wyników sprzedażowych — niezależnie od tego, czy dany klient jest objęty poufnością (patrz decyzja 26, która precyzuje, że poufność per klient to osobna, węższa sprawa).
 
 19. **[UZUPEŁNIENIE] Format pliku importowego .xlsx, nie CSV** — eliminuje problem separatora dziesiętnego i kodowania, skraca ścieżkę użytkownika.
 
@@ -288,9 +288,11 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 
 24. **[UZUPEŁNIENIE] Generator danych syntetycznych generuje dwa warianty pliku** (`--clean` do demo, `--with-errors` do testów walidacji) — szczegóły w VI.9. Golden file (z celowymi błędami) i dane demo (w całości poprawne) to dwa różne pliki, nie jeden — import całościowy (decyzja 2) odrzuciłby plik z błędami w całości, więc nie dałoby się nim zasilić instancji demo.
 
-26. **[UZUPEŁNIENIE] Zakres walidacji strukturalnej (zadanie 1.2) doprecyzowany z użytkownikiem** — szczegóły w II.5. Kluczowe rozstrzygnięcia: (a) flaga incydentalna (I) podlega tej samej regule „dokładnie jedna z F/G/H/I", co pozostałe trzy — nie jest wyjątkiem, mimo że pierwotne sformułowanie zadania wspominało tylko kolumny F–H; (b) w kolumnach flag akceptowana jest wyłącznie wartość liczbowa `1` — każda inna niepusta wartość to błąd formatu (ściślej niż uproszczone odczytanie `!= null` w `parseSalesRows`, które pozostaje bez zmian, bo działa już tylko na plikach, które przeszły tę walidację); (c) liczba porządkowa (kolumna A) nie musi zaczynać się od konkretnej wartości — wymagana jest wyłącznie ciągłość (+1 bez przerw), bo plik bywa wycinkiem większego arkusza; (d) NIP polski walidowany sumą kontrolną, VAT UE tylko kształtem (2 litery + 2–12 cyfr), bez sumy kontrolnej per kraj — pełna walidacja formatów VAT UE per kraj uznana za nadmiarową na tym etapie.
+25. **[UZUPEŁNIENIE] Zakres walidacji strukturalnej (zadanie 1.2) doprecyzowany z użytkownikiem** — szczegóły w II.5. Kluczowe rozstrzygnięcia: (a) flaga incydentalna (I) podlega tej samej regule „dokładnie jedna z F/G/H/I", co pozostałe trzy — nie jest wyjątkiem, mimo że pierwotne sformułowanie zadania wspominało tylko kolumny F–H; (b) w kolumnach flag akceptowana jest wyłącznie wartość liczbowa `1` — każda inna niepusta wartość to błąd formatu (ściślej niż uproszczone odczytanie `!= null` w `parseSalesRows`, które pozostaje bez zmian, bo działa już tylko na plikach, które przeszły tę walidację); (c) liczba porządkowa (kolumna A) nie musi zaczynać się od konkretnej wartości — wymagana jest wyłącznie ciągłość (+1 bez przerw), bo plik bywa wycinkiem większego arkusza; (d) NIP polski walidowany sumą kontrolną, VAT UE tylko kształtem (2 litery + 2–12 cyfr), bez sumy kontrolnej per kraj — pełna walidacja formatów VAT UE per kraj uznana za nadmiarową na tym etapie.
 
-27. **[UZUPEŁNIENIE] Rzeczywisty zakres poufności danych sprzedażowych jest wąski** — dotyczy tylko 3 konkretnych klientów objętych dodatkowymi umowami o poufności, nie całego zbioru danych. Poprzednia wersja decyzji 18 sugerowała poufność wszystkich danych sprzedażowych — to było zawyżone. **Konsekwencja dla pliku do backtestu (zadanie 0.8, lokalny, nigdy niecommitowany):** dane tych 3 klientów podmieniane są na dane innych firm (technika już stosowana przy prezentacji budżetów innym funduszom), pozostali klienci mogą pozostać niezmienieni. Nie zmienia to decyzji 18 dla instancji demo — tam powodem pełnej syntetyczności jest brak potrzeby publicznego ujawniania wyników, nie tylko poufność per klient.
+26. **[UZUPEŁNIENIE] Rzeczywisty zakres poufności danych sprzedażowych jest wąski** — dotyczy tylko 3 konkretnych klientów objętych dodatkowymi umowami o poufności, nie całego zbioru danych. Poprzednia wersja decyzji 18 sugerowała poufność wszystkich danych sprzedażowych — to było zawyżone. **Konsekwencja dla pliku do backtestu (zadanie 0.8, lokalny, nigdy niecommitowany):** dane tych 3 klientów podmieniane są na dane innych firm (technika już stosowana przy prezentacji budżetów innym funduszom), pozostali klienci mogą pozostać niezmienieni. Nie zmienia to decyzji 18 dla instancji demo — tam powodem pełnej syntetyczności jest brak potrzeby publicznego ujawniania wyników, nie tylko poufność per klient.
+
+27. **[UZUPEŁNIENIE] Flaga H (dokupienie) nie podlega ograniczeniu liczby miesięcy rozliczeniowych** — w przeciwieństwie do F/G (co najmniej 2 miesiące, II.3.c) i I (dokładnie jeden miesiąc, z definicji w II.2), flaga H może wystąpić zarówno w wersie jednomiesięcznym, jak i wielomiesięcznym. Uzasadnienie: SPEC.md II.3.c wprost ogranicza tylko F/G — milczenie na temat H potraktowano jako świadome pominięcie ograniczenia (dokupienie dodatkowych kont czy modułu może być rozliczane jednorazowo albo w ramach istniejącego pakietu długoterminowego), nie jako przeoczenie specyfikacji. Rozstrzygnięcie potwierdzone z użytkownikiem przy zadaniu 1.3.
 
 ---
 
@@ -383,8 +385,9 @@ Instancja produkcyjna to osobny projekt Vercel + osobny projekt Supabase, ten sa
 7. **Sekcja VI** — całość wymagań niefunkcjonalnych: hosting, autoryzacja, rozdział instancji demo/produkcyjnej, eksport, precyzja liczbowa, wydajność, bezpieczeństwo, jakość, zakres poza MVP.
 8. **II.4** — liczba wierszy nagłówkowych pliku importowego (zawsze dokładnie jeden), rozstrzygnięcie otwartego pytania `PLAN.md` P2.
 9. **VI.9** — generator danych syntetycznych w dwóch trybach (`--clean` / `--with-errors`), rozdzielenie golden file od danych demo.
-10. **V.18 (korekta)** — zawężenie zakresu poufności danych sprzedażowych do 3 konkretnych klientów objętych NDA, zamiast całego zbioru danych; patrz nowa decyzja 27.
+10. **V.18 (korekta)** — zawężenie zakresu poufności danych sprzedażowych do 3 konkretnych klientów objętych NDA, zamiast całego zbioru danych; patrz nowa decyzja 26.
 11. **V.15–27** — decyzje projektowe wynikające z powyższych uzupełnień.
-12. **II.5, V.26** — szczegółowe reguły walidacji strukturalnej pól (zadanie `PLAN.md` 1.2): ciągłość liczby porządkowej, minimalna długość nazwy klienta, suma kontrolna NIP / kształt VAT UE, wymóg dokładnie jednej flagi F–I z wartością `1`, wymóg niezerowego przychodu w co najmniej jednym miesiącu.
+12. **II.5, V.25** — szczegółowe reguły walidacji strukturalnej pól (zadanie `PLAN.md` 1.2): ciągłość liczby porządkowej, minimalna długość nazwy klienta, suma kontrolna NIP / kształt VAT UE, wymóg dokładnie jednej flagi F–I z wartością `1`, wymóg niezerowego przychodu w co najmniej jednym miesiącu.
+13. **II.3 (walidacja typu dokumentu i spójności flag), V.27** — zadanie `PLAN.md` 1.3: walidacja typu dokumentu względem listy znanych typów (FVS/FKS/FVZ/FVZK), wymóg flagi H lub I dla FVZK, spójność flagi F/G/I z liczbą miesięcy rozliczeniowych w wersie, rozstrzygnięcie dla flagi H (brak ograniczenia).
 
 **Redakcja:** treść merytoryczna sekcji I–V zachowana; ujednolicono formatowanie, poprawiono literówki, ponumerowano procedury referencyjne.
