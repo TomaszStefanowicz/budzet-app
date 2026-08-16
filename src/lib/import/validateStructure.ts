@@ -48,10 +48,15 @@ function isBlank(value: unknown): boolean {
   return value === null || value === undefined || value === "";
 }
 
+/**
+ * SPEC.md V.34 (koryguje V.25.d): plik źródłowy zawsze zawiera NIP jako czysty
+ * ciąg 10 cyfr, bez spacji ani myślników - inny zapis jest błędem formatu,
+ * nie czymś do "wyczyszczenia". Jedyna tolerowana normalizacja to obcięcie
+ * skrajnych białych znaków (szum kopiuj-wklej z Excela) i wielkość liter dla
+ * prefiksu kraju numeru VAT UE.
+ */
 function normalizeNip(raw: unknown): string {
-  return String(raw ?? "")
-    .replace(/[\s-]/g, "")
-    .toUpperCase();
+  return String(raw ?? "").trim().toUpperCase();
 }
 
 function isValidPolishNip(digits: string): boolean {

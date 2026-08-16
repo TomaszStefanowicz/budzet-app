@@ -108,6 +108,16 @@ describe("validateFileStructure", () => {
       const errors = validateFileStructure([HEADER, validRow({ 2: "D1234567" })]);
       expect(messagesFor(2, errors).some((m) => m.includes("NIP/numer VAT UE"))).toBe(true);
     });
+
+    it("odrzuca NIP zapisany z myślnikami (SPEC.md V.34) - plik źródłowy zawsze ma czysty format", () => {
+      const errors = validateFileStructure([HEADER, validRow({ 2: "526-000-12-46" })]);
+      expect(messagesFor(2, errors).some((m) => m.includes("NIP/numer VAT UE"))).toBe(true);
+    });
+
+    it("odrzuca NIP zapisany ze spacjami (SPEC.md V.34)", () => {
+      const errors = validateFileStructure([HEADER, validRow({ 2: "526 000 12 46" })]);
+      expect(messagesFor(2, errors).some((m) => m.includes("NIP/numer VAT UE"))).toBe(true);
+    });
   });
 
   describe("kolumna D - numer dokumentu", () => {
