@@ -15,7 +15,7 @@ function formatIdentity(e: StructuralValidationError): string | null {
   const nip = e.nip === undefined || e.nip === null || e.nip === "" ? "brak" : String(e.nip);
   const clientName =
     e.clientName === undefined || e.clientName === null || e.clientName === "" ? "brak" : String(e.clientName);
-  return `lp ${lp}, NIP ${nip}, klient ${clientName}`;
+  return `lp.: ${lp}, NIP: ${nip}, klient: ${clientName}`;
 }
 
 export function UploadForm() {
