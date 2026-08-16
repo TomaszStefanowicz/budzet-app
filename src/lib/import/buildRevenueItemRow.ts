@@ -1,6 +1,6 @@
-import type { ParsedSalesRow } from "./parseSalesRows";
-import { formatMonthDate } from "./formatMonthDate";
-import { formatGroszeAsDecimal } from "./formatGroszeAsDecimal";
+import type { ParsedSalesRow } from "./parseSalesRows.ts";
+import { formatMonthDate } from "./formatMonthDate.ts";
+import { formatGroszeAsDecimal } from "./formatGroszeAsDecimal.ts";
 
 export interface RevenueItemRow {
   import_id: number;
@@ -13,7 +13,7 @@ export interface RevenueItemRow {
   source_row_number: number;
 }
 
-function singleFlagLetter(flags: ParsedSalesRow["flags"]): "F" | "G" | "H" | "I" | null {
+export function singleFlagLetter(flags: ParsedSalesRow["flags"]): "F" | "G" | "H" | "I" | null {
   if (flags.F) return "F";
   if (flags.G) return "G";
   if (flags.H) return "H";
