@@ -3,6 +3,12 @@ import { createServiceRoleSupabaseClient } from "@/lib/supabase/service-role";
 import { signOut } from "./actions";
 import { UploadForm } from "./UploadForm";
 
+function formatMonthRange(from: string | null, to: string | null): string {
+  if (!from || !to) return "—";
+  const toYearMonth = (date: string) => date.slice(0, 7).replace("-", "/");
+  return `${toYearMonth(from)} – ${toYearMonth(to)}`;
+}
+
 export default async function Home() {
   const supabase = await createServerSupabaseClient();
   const {
@@ -12,7 +18,7 @@ export default async function Home() {
   const serviceRoleClient = createServiceRoleSupabaseClient();
   const { data: imports, error } = await serviceRoleClient
     .from("imports")
-    .select("id, imported_at, file_name, row_count, validation_status")
+    .select("id, imported_at, file_name, row_count, validation_status, detected_month_from, detected_month_to")
     .order("imported_at", { ascending: false });
 
   return (
@@ -53,6 +59,7 @@ export default async function Home() {
                 <th className="py-2 font-medium">Data importu</th>
                 <th className="py-2 font-medium">Plik</th>
                 <th className="py-2 font-medium">Liczba wersów</th>
+                <th className="py-2 font-medium">Zakres miesięcy</th>
                 <th className="py-2 font-medium">Wynik</th>
               </tr>
             </thead>
@@ -64,6 +71,7 @@ export default async function Home() {
                   </td>
                   <td className="py-2">{row.file_name}</td>
                   <td className="py-2">{row.row_count}</td>
+                  <td className="py-2">{formatMonthRange(row.detected_month_from, row.detected_month_to)}</td>
                   <td className="py-2">
                     {row.validation_status === "sukces" ? "sukces" : "błąd"}
                   </td>

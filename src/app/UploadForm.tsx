@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { StructuralValidationError } from "@/lib/import/validateStructure";
 
 interface UploadResult {
@@ -19,6 +20,7 @@ function formatIdentity(e: StructuralValidationError): string | null {
 }
 
 export function UploadForm() {
+  const router = useRouter();
   const [result, setResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<StructuralValidationError[]>([]);
@@ -41,6 +43,7 @@ export function UploadForm() {
 
     const response = await fetch("/api/import", { method: "POST", body: formData });
     setLoading(false);
+    router.refresh(); // odświeża "Historię importów" (page.tsx) - imports dostaje nowy wers niezależnie od wyniku
 
     if (response.status === 422) {
       const body = await response.json().catch(() => ({ errors: [] }));
