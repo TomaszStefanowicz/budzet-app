@@ -7,7 +7,19 @@ import { validateFlagContinuity } from "@/lib/import/validateFlagContinuity";
 import { combineValidationErrors } from "@/lib/import/combineValidationErrors";
 import { planClientDictionaryUpdates } from "@/lib/import/planClientDictionaryUpdates";
 import { formatMonthDate } from "@/lib/import/formatMonthDate";
+import { buildRevenueItemRow } from "@/lib/import/buildRevenueItemRow";
+import { buildRevenueMonthRows } from "@/lib/import/buildRevenueMonthRows";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/service-role";
+
+const DB_INSERT_CHUNK_SIZE = 500;
+
+function chunk<T>(items: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+  return chunks;
+}
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -83,15 +95,73 @@ export async function POST(request: Request) {
     }
   }
 
-  const { error: importLogError } = await supabase.from("imports").insert({
-    file_name: file.name,
-    row_count: rows.length,
-    validation_status: "sukces",
-    detected_month_from: monthRange ? formatMonthDate({ year: monthRange.fromYear, month: monthRange.fromMonth }) : null,
-    detected_month_to: monthRange ? formatMonthDate({ year: monthRange.toYear, month: monthRange.toMonth }) : null,
+  const { data: importRow, error: importLogError } = await supabase
+    .from("imports")
+    .insert({
+      file_name: file.name,
+      row_count: rows.length,
+      validation_status: "sukces",
+      detected_month_from: monthRange
+        ? formatMonthDate({ year: monthRange.fromYear, month: monthRange.fromMonth })
+        : null,
+      detected_month_to: monthRange ? formatMonthDate({ year: monthRange.toYear, month: monthRange.toMonth }) : null,
+    })
+    .select("id")
+    .single();
+  if (importLogError || !importRow) {
+    return NextResponse.json(
+      { error: `Błąd zapisu metryk importu: ${importLogError?.message ?? "brak danych"}` },
+      { status: 500 }
+    );
+  }
+  const importId: number = importRow.id;
+
+  // Import całościowy: wygaszamy poprzednie pozycje PRZED wstawieniem nowych
+  // (zasada twarda projektu + ustalona kolejność operacji, SPEC.md IV.5).
+  const { error: deactivateError } = await supabase
+    .from("revenue_items")
+    .update({ is_active: false })
+    .eq("is_active", true);
+  if (deactivateError) {
+    return NextResponse.json(
+      { error: `Błąd wygaszenia poprzednich pozycji rozliczeniowych: ${deactivateError.message}` },
+      { status: 500 }
+    );
+  }
+
+  const idBySourceRowNumber = new Map<number, number>();
+  for (const batch of chunk(rows, DB_INSERT_CHUNK_SIZE)) {
+    const { data: insertedItems, error: itemsError } = await supabase
+      .from("revenue_items")
+      .insert(batch.map((row) => buildRevenueItemRow(row, importId)))
+      .select("id, source_row_number");
+    if (itemsError || !insertedItems) {
+      return NextResponse.json(
+        { error: `Błąd zapisu pozycji rozliczeniowych: ${itemsError?.message ?? "brak danych"}` },
+        { status: 500 }
+      );
+    }
+    for (const item of insertedItems) {
+      idBySourceRowNumber.set(item.source_row_number, item.id);
+    }
+  }
+
+  const monthRows = rows.flatMap((row) => {
+    const revenueItemId = idBySourceRowNumber.get(row.sourceRowNumber);
+    if (revenueItemId === undefined) {
+      throw new Error(`Brak zapisanej pozycji rozliczeniowej dla wersu ${row.sourceRowNumber}.`);
+    }
+    return buildRevenueMonthRows(row, revenueItemId);
   });
-  if (importLogError) {
-    return NextResponse.json({ error: `Błąd zapisu metryk importu: ${importLogError.message}` }, { status: 500 });
+
+  for (const batch of chunk(monthRows, DB_INSERT_CHUNK_SIZE)) {
+    const { error: monthsError } = await supabase.from("revenue_months").insert(batch);
+    if (monthsError) {
+      return NextResponse.json(
+        { error: `Błąd zapisu przychodów miesięcznych: ${monthsError.message}` },
+        { status: 500 }
+      );
+    }
   }
 
   return NextResponse.json({

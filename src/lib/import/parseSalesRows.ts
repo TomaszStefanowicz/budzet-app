@@ -47,7 +47,8 @@ function parseSaleMonth(documentNumber: string): { year: number; month: number }
   return { year: Number(yearRaw), month: Number(monthRaw) };
 }
 
-function monthIndexToDate(index: number): { year: number; month: number } {
+/** Zamienia indeks kolumny miesięcznej (0 = styczeń 2024) na rok/miesiąc kalendarzowy. */
+export function monthIndexToDate(index: number): { year: number; month: number } {
   const totalMonths = (MONTH_COLUMNS_START.year * 12 + (MONTH_COLUMNS_START.month - 1)) + index;
   return { year: Math.floor(totalMonths / 12), month: (totalMonths % 12) + 1 };
 }
