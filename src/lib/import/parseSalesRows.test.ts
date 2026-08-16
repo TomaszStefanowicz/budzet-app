@@ -74,4 +74,25 @@ describe("parseSalesRows", () => {
     ]);
     expect(result.rows[0].documentType).toBe("FKS");
   });
+
+  describe("miesiąc sprzedaży (SPEC.md II.2, linia 55)", () => {
+    it("wyodrębnia miesiąc sprzedaży wyłącznie z numeru dokumentu", () => {
+      const result = parseSalesRows([
+        HEADER_9_PLUS_3_MONTHS,
+        [1, "Firma A", "1234567890", "FVS/2024/03/0001", 1200, 1, null, null, null, 1200, null, null],
+      ]);
+      expect(result.rows[0].saleMonth).toEqual({ year: 2024, month: 3 });
+    });
+
+    it("miesiąc sprzedaży jest niezależny od tego, która kolumna miesięczna ma przychód", () => {
+      // numer dokumentu wskazuje styczeń, ale przychód pojawia się dopiero w marcu -
+      // dokładnie sytuacja, w której faktura wyprzedza właściwe rozliczenie o kilka miesięcy.
+      const result = parseSalesRows([
+        HEADER_9_PLUS_3_MONTHS,
+        [1, "Firma A", "1234567890", "FVS/2024/01/0001", 1200, 1, null, null, null, null, null, 1200],
+      ]);
+      expect(result.rows[0].saleMonth).toEqual({ year: 2024, month: 1 });
+      expect(result.rows[0].monthlyAmountsGrosze).toEqual([0, 0, 120000]);
+    });
+  });
 });

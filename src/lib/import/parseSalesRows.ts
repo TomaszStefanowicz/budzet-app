@@ -7,6 +7,7 @@ export interface ParsedSalesRow {
   nip: string;
   documentNumber: string;
   documentType: string;
+  saleMonth: { year: number; month: number }; // wyłącznie z segmentu rrrr/mm numeru dokumentu (SPEC.md II.2, linia 55)
   netAmountGrosze: number;
   flags: { F: boolean; G: boolean; H: boolean; I: boolean };
   monthlyAmountsGrosze: number[]; // indeks 0 = styczeń 2024
@@ -32,6 +33,18 @@ function toGrosze(value: unknown): number {
 function toText(value: unknown): string {
   if (value === null || value === undefined) return "";
   return String(value).trim();
+}
+
+/**
+ * Wyodrębnia miesiąc sprzedaży z segmentu rrrr/mm numeru dokumentu (SPEC.md
+ * II.2, linia 55) - jedyne dopuszczalne źródło tego pola, niezależnie od
+ * kolumn miesięcznych czy długości rozliczenia. Zakłada już poprawny format
+ * TYP/rrrr/mm/nnnn (wymuszony przez validateFileStructure przed wywołaniem
+ * tego parsera - tak samo jak dziś działa wyodrębnianie documentType).
+ */
+function parseSaleMonth(documentNumber: string): { year: number; month: number } {
+  const [, yearRaw, monthRaw] = documentNumber.split("/");
+  return { year: Number(yearRaw), month: Number(monthRaw) };
 }
 
 function monthIndexToDate(index: number): { year: number; month: number } {
@@ -65,12 +78,15 @@ export function parseSalesRows(rawRows: unknown[][]): ParsedSalesFile {
       toGrosze(row[FIXED_COLUMN_COUNT + m])
     );
 
+    const documentNumber = toText(row[3]);
+
     return {
       sourceRowNumber: i + 2, // +1 za nagłówek, +1 bo wersy liczone od 1
       clientName: toText(row[1]),
       nip: toText(row[2]),
-      documentNumber: toText(row[3]),
-      documentType: toText(row[3]).split("/")[0],
+      documentNumber,
+      documentType: documentNumber.split("/")[0],
+      saleMonth: parseSaleMonth(documentNumber),
       netAmountGrosze: toGrosze(row[4]),
       flags: {
         F: row[5] != null,
