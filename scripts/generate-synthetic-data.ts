@@ -134,9 +134,33 @@ function makeMonthly(startIdx: number, amounts: number[]): Map<number, number> {
   return map;
 }
 
-function negateMonthly(monthly: Map<number, number>): Map<number, number> {
+/**
+ * Rozkłada miesięczny wpływ korekty (FKS) na miesiące zgodnie z zasadą
+ * nieretroaktywności ksiąg (SPEC.md V.33): miesiące wcześniejsze niż własny
+ * miesiąc sprzedaży korekty są już zrealizowane (zamknięte) - ich reversal
+ * jest skumulowany i ujęty w całości w miesiącu sprzedaży korekty, zamiast
+ * wracać do tamtych miesięcy. Miesiące od miesiąca korekty wzwyż (bieżący
+ * i przyszłe) zachowują własny, osobny odwrócony odpis w swoim miesiącu.
+ */
+function correctionMonthly(
+  originalMonthly: Map<number, number>,
+  correctionSaleMonthIdx: number
+): Map<number, number> {
   const map = new Map<number, number>();
-  monthly.forEach((v, k) => map.set(k, -v));
+  let alreadyRealizedLump = 0;
+
+  for (const [idx, amount] of originalMonthly) {
+    if (idx < correctionSaleMonthIdx) {
+      alreadyRealizedLump += -amount;
+    } else {
+      map.set(idx, (map.get(idx) ?? 0) + -amount);
+    }
+  }
+
+  if (alreadyRealizedLump !== 0) {
+    map.set(correctionSaleMonthIdx, (map.get(correctionSaleMonthIdx) ?? 0) + alreadyRealizedLump);
+  }
+
   return map;
 }
 
@@ -282,7 +306,7 @@ function addCorrections(rand: RandomFn, rows: DataRow[]): DataRow[] {
       saleMonthIdx: correctionMonthIdx,
       netGrosze: -row.netGrosze,
       flags: noFlags(),
-      monthlyGrosze: negateMonthly(row.monthlyGrosze),
+      monthlyGrosze: correctionMonthly(row.monthlyGrosze, correctionMonthIdx),
     });
   }
   return corrections;
@@ -325,7 +349,7 @@ function buildEdgeCases(): EdgeCaseResult {
       saleMonthIdx: monthIndex(2024, 5),
       netGrosze: -total,
       flags: noFlags(),
-      monthlyGrosze: negateMonthly(makeMonthly(startIdx, amounts)),
+      monthlyGrosze: correctionMonthly(makeMonthly(startIdx, amounts), monthIndex(2024, 5)),
     });
     manifest.push({
       name,
