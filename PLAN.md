@@ -53,15 +53,17 @@ Cel: serce aplikacji. To tu kryje się największe ryzyko z decyzji V.5 — „p
 
 ## Etap 2 — Silnik zestawień (dni 6–8)
 
+**[UZUPEŁNIENIE] Ograniczenie zakresu na czas terminu (decyzja `SPEC.md` V.37).** Przy 7 dniach kalendarzowych do terminu i wzorcu z Etapu 1 (prawie każde zadanie ujawniało coś wymagającego korekty po teście na danych rzeczywistych) świadomie odkładamy zestawienia 13–15 (2.4, 2.5) jako bufor czasowy — wracamy do nich, jeśli zostanie czas, inaczej po zaliczeniu. Priorytet realizacji: **2.1 → 2.2 → 2.3 → 2.6 → 2.7 → (jeśli zostanie czas) 2.4 → 2.5.**
+
 - [ ] **2.1** Warstwa agregacji per klient (`SPEC.md` 11a): miesięczne serie przychodów per NIP, z regułą „przychód > 0" i podziałem na serie dla zestawień 12 oraz 13–15. Czyste funkcje, testy.
 - [ ] **2.2** Zestawienia 1–11 (`SPEC.md` III.A) + wyodrębniona pozycja „korekty" (decyzja V.10). Test kontrolny: sumy kategorii flagowych + korekty = suma całkowita.
 - [ ] **2.3** Zestawienie 12 — liczba i lista klientów z przychodami, z sumą faktur i numerami dokumentów.
-- [ ] **2.4** Zestawienie 13 — wygasające umowy, **z regułą horyzontu `SPEC.md` 13.d** i kwotą przychodów z miesiąca POPRZEDNIEGO (13.b.v). Testy obu warunków granicznych.
-- [ ] **2.5** Zestawienia 14 i 15 — startujące umowy nowe i przedłużenia, z regułą horyzontu.
 - [ ] **2.6** Zestawienie 16 — banki i SKOK-i na podstawie słownika.
-- [ ] **2.7** **BACKTEST.** Na pliku z zadania 0.8, lokalnie: porównanie wyników aplikacji z dotychczasowymi ręcznymi zestawieniami za minimum 3 miesiące. Każda rozbieżność wyjaśniona i zapisana. Rozbieżność może oznaczać błąd aplikacji **albo błąd procedury ręcznej** — oba warto wiedzieć.
+- [ ] **2.7** **BACKTEST** (dla zestawień 1–12, 16). Na pliku z zadania 0.8, lokalnie: porównanie wyników aplikacji z dotychczasowymi ręcznymi zestawieniami za minimum 3 miesiące. Każda rozbieżność wyjaśniona i zapisana. Rozbieżność może oznaczać błąd aplikacji **albo błąd procedury ręcznej** — oba warto wiedzieć.
+- [ ] **2.4** *(odłożone — patrz uzupełnienie wyżej)* Zestawienie 13 — wygasające umowy, **z regułą horyzontu `SPEC.md` 13.d** i kwotą przychodów z miesiąca POPRZEDNIEGO (13.b.v). Testy obu warunków granicznych.
+- [ ] **2.5** *(odłożone — patrz uzupełnienie wyżej)* Zestawienia 14 i 15 — startujące umowy nowe i przedłużenia, z regułą horyzontu.
 
-**Kryterium ukończenia:** wszystkie 16 zestawień liczy się poprawnie, backtest zamknięty, rozbieżności wyjaśnione.
+**Kryterium ukończenia (zakres minimalny na termin):** zestawienia 1–12 i 16 liczą się poprawnie, backtest dla nich zamknięty, rozbieżności wyjaśnione. Zestawienia 13–15 — cel rozszerzony, nie warunek zaliczenia w terminie.
 
 ---
 
