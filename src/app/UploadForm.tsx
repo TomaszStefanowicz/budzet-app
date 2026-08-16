@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { StructuralValidationError } from "@/lib/import/validateStructure";
 
 interface UploadResult {
   fileName: string;
@@ -8,9 +9,13 @@ interface UploadResult {
   monthRange: { fromYear: number; fromMonth: number; toYear: number; toMonth: number } | null;
 }
 
-interface StructuralValidationError {
-  sourceRowNumber: number;
-  message: string;
+function formatIdentity(e: StructuralValidationError): string | null {
+  if (e.lp === undefined && e.nip === undefined && e.clientName === undefined) return null;
+  const lp = e.lp === undefined || e.lp === null || e.lp === "" ? "brak" : String(e.lp);
+  const nip = e.nip === undefined || e.nip === null || e.nip === "" ? "brak" : String(e.nip);
+  const clientName =
+    e.clientName === undefined || e.clientName === null || e.clientName === "" ? "brak" : String(e.clientName);
+  return `lp ${lp}, NIP ${nip}, klient ${clientName}`;
 }
 
 export function UploadForm() {
@@ -76,11 +81,15 @@ export function UploadForm() {
             {validationErrors.length === 1 ? "błąd" : "błędów"}:
           </p>
           <ul className="max-h-64 space-y-1 overflow-y-auto text-sm text-red-700">
-            {validationErrors.map((e, i) => (
-              <li key={i}>
-                Wers {e.sourceRowNumber}: {e.message}
-              </li>
-            ))}
+            {validationErrors.map((e, i) => {
+              const identity = formatIdentity(e);
+              return (
+                <li key={i}>
+                  {i + 1}. Wers {e.sourceRowNumber}
+                  {identity ? ` (${identity})` : ""}: {e.message}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

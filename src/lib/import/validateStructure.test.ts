@@ -198,6 +198,24 @@ describe("validateFileStructure", () => {
     const errors = validateFileStructure([HEADER, validRow({ 1: "Ab", 2: "niepoprawny-nip", 5: null })]);
     expect(messagesFor(2, errors).length).toBeGreaterThanOrEqual(3);
   });
+
+  describe("identyfikacja wersu w komunikacie błędu (SPEC.md V.32)", () => {
+    it("dołącza lp, NIP i nazwę klienta do błędu dotyczącego konkretnego wersu", () => {
+      const errors = validateFileStructure([HEADER, validRow({ 4: 0 })]);
+      const error = errors.find((e) => e.sourceRowNumber === 2);
+      expect(error).toMatchObject({ lp: 20, nip: VALID_NIP, clientName: "Firma Testowa" });
+    });
+
+    it("nie dołącza identyfikacji wersu do błędów dotyczących całego pliku", () => {
+      const errors = validateFileStructure([HEADER.slice(0, 5), validRow().slice(0, 5)]);
+      expect(errors).toEqual([{ sourceRowNumber: 1, message: expect.stringContaining("za mało kolumn") }]);
+    });
+
+    it("etykiety flag F/G/H/I są czytelne, nie tylko literą kolumny", () => {
+      const errors = validateFileStructure([HEADER, validRow({ 5: "x" })]);
+      expect(messagesFor(2, errors).some((m) => m.includes("F (nowy dostęp)"))).toBe(true);
+    });
+  });
 });
 
 describe("validateFileStructure (integracja na pliku syntetycznym)", () => {

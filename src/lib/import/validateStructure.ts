@@ -2,6 +2,11 @@ const FIXED_COLUMN_COUNT = 9; // A-I
 
 export interface StructuralValidationError {
   sourceRowNumber: number; // numer wersu w pliku źródłowym (wers 1 = nagłówek)
+  // Identyfikacja wersu (SPEC.md V.32) - pomijana dla błędów dotyczących całego pliku,
+  // a nie konkretnego wersu (np. zbyt mało kolumn).
+  lp?: unknown;
+  nip?: unknown;
+  clientName?: unknown;
   message: string;
 }
 
@@ -15,12 +20,29 @@ const FIELD_NAMES = [
 
 const DOCUMENT_NUMBER_PATTERN = /^[A-Z]+\/\d{4}\/(0[1-9]|1[0-2])\/\d{4}$/;
 
-const FLAG_COLUMNS = [
-  { index: 5, letter: "F" },
-  { index: 6, letter: "G" },
-  { index: 7, letter: "H" },
-  { index: 8, letter: "I" },
-];
+/**
+ * Znaczenie flag F/G/H/I jest regułą biznesową stałą w kodzie (SPEC.md II),
+ * niezależną od treści nagłówka importowanego pliku (SPEC.md V.32) - w
+ * przeciwieństwie do zakresu kolumn miesięcznych, który JEST wykrywany
+ * dynamicznie z pliku (zasada twarda nr 11).
+ */
+export const FLAG_COLUMNS = [
+  { index: 5, letter: "F", label: "nowy dostęp" },
+  { index: 6, letter: "G", label: "przedłużenie" },
+  { index: 7, letter: "H", label: "dokupienie" },
+  { index: 8, letter: "I", label: "incydentalny" },
+] as const;
+
+export function flagColumnLabel(letter: string): string {
+  return FLAG_COLUMNS.find((f) => f.letter === letter)?.label ?? letter;
+}
+
+const FLAG_COLUMNS_SUMMARY = FLAG_COLUMNS.map((f) => `${f.letter} (${f.label})`).join(" / ");
+
+/** Pola identyfikujące wers dla czytelności raportu błędów (SPEC.md V.32). */
+export function rowIdentity(row: unknown[]): { lp: unknown; nip: unknown; clientName: unknown } {
+  return { lp: row[0], nip: row[2], clientName: row[1] };
+}
 
 function isBlank(value: unknown): boolean {
   return value === null || value === undefined || value === "";
@@ -80,9 +102,11 @@ export function validateFileStructure(rawRows: unknown[][]): StructuralValidatio
   dataRows.forEach((row, i) => {
     const sourceRowNumber = i + 2;
 
+    const identity = rowIdentity(row);
+
     for (let col = 0; col < 5; col++) {
       if (isBlank(row[col])) {
-        errors.push({ sourceRowNumber, message: `Brak wartości w kolumnie ${FIELD_NAMES[col]}.` });
+        errors.push({ sourceRowNumber, ...identity, message: `Brak wartości w kolumnie ${FIELD_NAMES[col]}.` });
       }
     }
 
@@ -91,12 +115,17 @@ export function validateFileStructure(rawRows: unknown[][]): StructuralValidatio
       if (expectedLp !== null && lpRaw !== expectedLp) {
         errors.push({
           sourceRowNumber,
+          ...identity,
           message: `Liczba porządkowa (kolumna A) nie jest kolejna — oczekiwano ${expectedLp}, znaleziono ${lpRaw}.`,
         });
       }
       expectedLp = lpRaw + 1;
     } else if (!isBlank(lpRaw)) {
-      errors.push({ sourceRowNumber, message: "Kolumna A (liczba porządkowa) musi zawierać liczbę całkowitą." });
+      errors.push({
+        sourceRowNumber,
+        ...identity,
+        message: "Kolumna A (liczba porządkowa) musi zawierać liczbę całkowitą.",
+      });
       expectedLp = null;
     } else {
       expectedLp = null;
@@ -104,12 +133,16 @@ export function validateFileStructure(rawRows: unknown[][]): StructuralValidatio
 
     const nameRaw = row[1];
     if ((typeof nameRaw === "string" || typeof nameRaw === "number") && String(nameRaw).trim().length < 3) {
-      errors.push({ sourceRowNumber, message: "Nazwa klienta (kolumna B) musi mieć co najmniej 3 znaki." });
+      errors.push({ sourceRowNumber, ...identity, message: "Nazwa klienta (kolumna B) musi mieć co najmniej 3 znaki." });
     }
 
     const nipRaw = row[2];
     if (!isBlank(nipRaw) && !isValidNipOrVatEu(nipRaw)) {
-      errors.push({ sourceRowNumber, message: `NIP/numer VAT UE (kolumna C) ma nieprawidłowy format: "${nipRaw}".` });
+      errors.push({
+        sourceRowNumber,
+        ...identity,
+        message: `NIP/numer VAT UE (kolumna C) ma nieprawidłowy format: "${nipRaw}".`,
+      });
     }
 
     const docNumberRaw = row[3];
@@ -119,54 +152,66 @@ export function validateFileStructure(rawRows: unknown[][]): StructuralValidatio
       if (!DOCUMENT_NUMBER_PATTERN.test(docNumberRaw)) {
         errors.push({
           sourceRowNumber,
+          ...identity,
           message: `Numer dokumentu (kolumna D) ma nieprawidłowy format: "${docNumberRaw}" (oczekiwano TYP/rrrr/mm/nnnn).`,
         });
       }
     } else if (!isBlank(docNumberRaw)) {
-      errors.push({ sourceRowNumber, message: "Numer dokumentu (kolumna D) musi być tekstem." });
+      errors.push({ sourceRowNumber, ...identity, message: "Numer dokumentu (kolumna D) musi być tekstem." });
     }
 
     const amountRaw = row[4];
     if (typeof amountRaw === "number") {
       if (amountRaw === 0) {
-        errors.push({ sourceRowNumber, message: "Wartość netto (kolumna E) nie może być równa zero." });
+        errors.push({ sourceRowNumber, ...identity, message: "Wartość netto (kolumna E) nie może być równa zero." });
       } else if (amountRaw < 0 && documentType !== "FKS") {
         errors.push({
           sourceRowNumber,
+          ...identity,
           message: "Wartość netto (kolumna E) jest ujemna, ale dokument nie jest fakturą korygującą (FKS).",
         });
       }
     } else if (!isBlank(amountRaw)) {
-      errors.push({ sourceRowNumber, message: "Wartość netto (kolumna E) musi być liczbą." });
+      errors.push({ sourceRowNumber, ...identity, message: "Wartość netto (kolumna E) musi być liczbą." });
     }
 
     if (documentType === "FKS") {
-      for (const { index, letter } of FLAG_COLUMNS) {
+      for (const { index, letter, label } of FLAG_COLUMNS) {
         if (!isBlank(row[index])) {
           errors.push({
             sourceRowNumber,
-            message: `Faktura korygująca (FKS) nie powinna mieć ustawionej flagi w kolumnie ${letter}.`,
+            ...identity,
+            message: `Faktura korygująca (FKS) nie powinna mieć ustawionej flagi w kolumnie ${letter} (${label}).`,
           });
         }
       }
     } else {
       let setCount = 0;
-      for (const { index, letter } of FLAG_COLUMNS) {
+      for (const { index, letter, label } of FLAG_COLUMNS) {
         const value = row[index];
         if (!isBlank(value)) {
           setCount++;
           if (value !== 1) {
             errors.push({
               sourceRowNumber,
-              message: `Kolumna ${letter} zawiera nieprawidłową wartość flagi: "${value}" (dozwolona wyłącznie liczba 1).`,
+              ...identity,
+              message: `Kolumna ${letter} (${label}) zawiera nieprawidłową wartość flagi: "${value}" (dozwolona wyłącznie liczba 1).`,
             });
           }
         }
       }
       if (setCount === 0) {
-        errors.push({ sourceRowNumber, message: "Brak ustawionej flagi w kolumnach F-I." });
+        errors.push({
+          sourceRowNumber,
+          ...identity,
+          message: `Brak ustawionej flagi w kolumnach ${FLAG_COLUMNS_SUMMARY}.`,
+        });
       } else if (setCount > 1) {
-        errors.push({ sourceRowNumber, message: "Więcej niż jedna flaga ustawiona w kolumnach F-I." });
+        errors.push({
+          sourceRowNumber,
+          ...identity,
+          message: `Więcej niż jedna flaga ustawiona w kolumnach ${FLAG_COLUMNS_SUMMARY}.`,
+        });
       }
     }
 
@@ -177,12 +222,17 @@ export function validateFileStructure(rawRows: unknown[][]): StructuralValidatio
         if (typeof cell === "number") {
           if (cell !== 0) hasNonZeroMonth = true;
         } else if (!isBlank(cell)) {
-          errors.push({ sourceRowNumber, message: `Nieprawidłowy format kwoty w kolumnie miesięcznej: "${cell}".` });
+          errors.push({
+            sourceRowNumber,
+            ...identity,
+            message: `Nieprawidłowy format kwoty w kolumnie miesięcznej: "${cell}".`,
+          });
         }
       }
       if (!hasNonZeroMonth) {
         errors.push({
           sourceRowNumber,
+          ...identity,
           message: "Brak przychodu w jakimkolwiek miesiącu (wszystkie kolumny miesięczne są puste lub zerowe).",
         });
       }

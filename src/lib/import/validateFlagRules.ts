@@ -1,15 +1,8 @@
-import type { StructuralValidationError } from "./validateStructure";
+import { FLAG_COLUMNS, flagColumnLabel, rowIdentity, type StructuralValidationError } from "./validateStructure";
 
 const FIXED_COLUMN_COUNT = 9; // A-I
 
 const KNOWN_DOCUMENT_TYPES = new Set(["FVS", "FKS", "FVZ", "FVZK"]);
-
-const FLAG_COLUMNS = [
-  { index: 5, letter: "F" },
-  { index: 6, letter: "G" },
-  { index: 7, letter: "H" },
-  { index: 8, letter: "I" },
-];
 
 function isBlank(value: unknown): boolean {
   return value === null || value === undefined || value === "";
@@ -43,6 +36,8 @@ export function validateDocumentAndFlagRules(rawRows: unknown[][]): StructuralVa
   dataRows.forEach((row, i) => {
     const sourceRowNumber = i + 2;
 
+    const identity = rowIdentity(row);
+
     const docNumberRaw = row[3];
     if (typeof docNumberRaw !== "string") return;
 
@@ -50,6 +45,7 @@ export function validateDocumentAndFlagRules(rawRows: unknown[][]): StructuralVa
     if (!KNOWN_DOCUMENT_TYPES.has(documentType)) {
       errors.push({
         sourceRowNumber,
+        ...identity,
         message: `Nieznany typ dokumentu (kolumna D): "${documentType}" — dozwolone typy: FVS, FKS, FVZ, FVZK.`,
       });
       return;
@@ -63,7 +59,8 @@ export function validateDocumentAndFlagRules(rawRows: unknown[][]): StructuralVa
     if (documentType === "FVZK" && flag === "F") {
       errors.push({
         sourceRowNumber,
-        message: "Faktura zaliczkowa końcowa (FVZK) nie może mieć flagi F (SPEC.md II.3.e) — dozwolone G, H lub I.",
+        ...identity,
+        message: `Faktura zaliczkowa końcowa (FVZK) nie może mieć flagi F (${flagColumnLabel("F")}) (SPEC.md II.3.e) — dozwolone G (${flagColumnLabel("G")}), H (${flagColumnLabel("H")}) lub I (${flagColumnLabel("I")}).`,
       });
     }
 
@@ -72,7 +69,8 @@ export function validateDocumentAndFlagRules(rawRows: unknown[][]): StructuralVa
       if (nonZeroMonths !== 1) {
         errors.push({
           sourceRowNumber,
-          message: `Flaga I (zakup incydentalny) wymaga rozliczenia w dokładnie jednym miesiącu, znaleziono ${nonZeroMonths}.`,
+          ...identity,
+          message: `Flaga I (${flagColumnLabel("I")}) wymaga rozliczenia w dokładnie jednym miesiącu, znaleziono ${nonZeroMonths}.`,
         });
       }
     }

@@ -4,6 +4,7 @@ import { parseSalesRows } from "@/lib/import/parseSalesRows";
 import { validateFileStructure } from "@/lib/import/validateStructure";
 import { validateDocumentAndFlagRules } from "@/lib/import/validateFlagRules";
 import { validateFlagContinuity } from "@/lib/import/validateFlagContinuity";
+import { combineValidationErrors } from "@/lib/import/combineValidationErrors";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -20,11 +21,11 @@ export async function POST(request: Request) {
   const buffer = await file.arrayBuffer();
   const rawRows = parseWorkbookBuffer(buffer);
 
-  const errors = [
-    ...validateFileStructure(rawRows),
-    ...validateDocumentAndFlagRules(rawRows),
-    ...validateFlagContinuity(rawRows),
-  ];
+  const errors = combineValidationErrors(
+    validateFileStructure(rawRows),
+    validateDocumentAndFlagRules(rawRows),
+    validateFlagContinuity(rawRows)
+  );
   if (errors.length > 0) {
     return NextResponse.json({ fileName: file.name, errors }, { status: 422 });
   }

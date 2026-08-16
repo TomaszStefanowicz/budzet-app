@@ -1,4 +1,4 @@
-import type { StructuralValidationError } from "./validateStructure";
+import { flagColumnLabel, rowIdentity, type StructuralValidationError } from "./validateStructure";
 
 const FIXED_COLUMN_COUNT = 9; // A-I
 const HORIZON_MONTHS = 12;
@@ -8,6 +8,7 @@ interface FlagEntry {
   flag: "F" | "G";
   startIdx: number;
   endIdx: number;
+  identity: { lp: unknown; nip: unknown; clientName: unknown };
 }
 
 function isBlank(value: unknown): boolean {
@@ -67,7 +68,13 @@ export function validateFlagContinuity(rawRows: unknown[][]): StructuralValidati
     const span = monthSpan(row);
     if (!span) return; // brak przychodu w żadnym miesiącu - zgłoszone już przez validateFileStructure
 
-    const entry: FlagEntry = { sourceRowNumber, flag: isF ? "F" : "G", startIdx: span.start, endIdx: span.end };
+    const entry: FlagEntry = {
+      sourceRowNumber,
+      flag: isF ? "F" : "G",
+      startIdx: span.start,
+      endIdx: span.end,
+      identity: rowIdentity(row),
+    };
     if (!byNip.has(nip)) byNip.set(nip, []);
     byNip.get(nip)!.push(entry);
   });
@@ -86,13 +93,15 @@ export function validateFlagContinuity(rawRows: unknown[][]): StructuralValidati
       if (entry.flag === "F" && gapMonths <= HORIZON_MONTHS) {
         errors.push({
           sourceRowNumber: entry.sourceRowNumber,
-          message: `Flaga F niepoprawna: poprzedni dostęp tego NIP wygasł ${gapMonths} mies. przed tym wersem (≤12) — powinna być flaga G (SPEC.md II.3.g).`,
+          ...entry.identity,
+          message: `Flaga F (${flagColumnLabel("F")}) niepoprawna: poprzedni dostęp tego NIP wygasł ${gapMonths} mies. przed tym wersem (≤12) — powinna być flaga G (${flagColumnLabel("G")}) (SPEC.md II.3.g).`,
         });
       }
       if (entry.flag === "G" && gapMonths > HORIZON_MONTHS) {
         errors.push({
           sourceRowNumber: entry.sourceRowNumber,
-          message: `Flaga G niepoprawna: poprzedni dostęp tego NIP wygasł ${gapMonths} mies. przed tym wersem (>12) — powinna być flaga F (SPEC.md II.3.g).`,
+          ...entry.identity,
+          message: `Flaga G (${flagColumnLabel("G")}) niepoprawna: poprzedni dostęp tego NIP wygasł ${gapMonths} mies. przed tym wersem (>12) — powinna być flaga F (${flagColumnLabel("F")}) (SPEC.md II.3.g).`,
         });
       }
     });
