@@ -55,7 +55,7 @@ Cel: serce aplikacji. To tu kryje się największe ryzyko z decyzji V.5 — „p
 
 **[UZUPEŁNIENIE] Ograniczenie zakresu na czas terminu (decyzja `SPEC.md` V.37).** Przy 7 dniach kalendarzowych do terminu i wzorcu z Etapu 1 (prawie każde zadanie ujawniało coś wymagającego korekty po teście na danych rzeczywistych) świadomie odkładamy zestawienia 13–15 (2.4, 2.5) jako bufor czasowy — wracamy do nich, jeśli zostanie czas, inaczej po zaliczeniu. Priorytet realizacji: **2.1 → 2.2 → 2.3 → 2.6 → 2.7 → (jeśli zostanie czas) 2.4 → 2.5.**
 
-- [ ] **2.1** Warstwa agregacji per klient (`SPEC.md` 11a): miesięczne serie przychodów per NIP, z regułą „przychód > 0" i podziałem na serie dla zestawień 12 oraz 13–15. Czyste funkcje, testy.
+- [x] **2.1** Warstwa agregacji per klient (`SPEC.md` 11a): miesięczne serie przychodów per NIP, z regułą „przychód > 0". Czyste funkcje (`parseDecimalToGrosze`, `aggregateMonthlyRevenuePerClient`) + testy. Filtr F/G/H+FKS (bez I) dla przyszłych zestawień 13–15 to jeden dodatkowy `.filter()` u wywołującego, nie osobna logika. Przy okazji: skrypt `scripts/preview-report.ts` (`npm run reports:preview -- --month=rrrr-mm`) do ręcznego podglądu wyników na żywej bazie, zanim powstanie ekran zestawień (Etap 3) — zweryfikowany na danych demo (89 klientów w 2024-06, kwoty sensowne).
 - [ ] **2.2** Zestawienia 1–11 (`SPEC.md` III.A) + wyodrębniona pozycja „korekty" (decyzja V.10). Test kontrolny: sumy kategorii flagowych + korekty = suma całkowita.
 - [ ] **2.3** Zestawienie 12 — liczba i lista klientów z przychodami, z sumą faktur i numerami dokumentów.
 - [ ] **2.6** Zestawienie 16 — banki i SKOK-i na podstawie słownika.

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "generate:data": "node scripts/generate-synthetic-data.ts"
+    "generate:data": "node scripts/generate-synthetic-data.ts",
+    "reports:preview": "node --env-file=.env.local scripts/preview-report.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
