@@ -1,4 +1,4 @@
-import { flagColumnLabel, rowIdentity, type StructuralValidationError } from "./validateStructure";
+import { flagColumnLabel, rowIdentity, type StructuralValidationError } from "./validateStructure.ts";
 
 const FIXED_COLUMN_COUNT = 9; // A-I
 const HORIZON_MONTHS = 12;

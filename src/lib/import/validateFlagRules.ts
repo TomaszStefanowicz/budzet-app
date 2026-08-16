@@ -1,4 +1,4 @@
-import { FLAG_COLUMNS, flagColumnLabel, rowIdentity, type StructuralValidationError } from "./validateStructure";
+import { FLAG_COLUMNS, flagColumnLabel, rowIdentity, type StructuralValidationError } from "./validateStructure.ts";
 
 const FIXED_COLUMN_COUNT = 9; // A-I
 
