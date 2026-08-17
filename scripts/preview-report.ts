@@ -30,6 +30,7 @@ import { aggregateMonthlyRevenuePerClient } from "../src/lib/reports/aggregateMo
 import { sumByFlag } from "../src/lib/reports/sumByFlag.ts";
 import { buildClientMonthlyRevenueReport } from "../src/lib/reports/buildClientMonthlyRevenueReport.ts";
 import type { ItemMonthFact } from "../src/lib/reports/buildClientMonthlyRevenueReport.ts";
+import { countBanksAndSkoks } from "../src/lib/reports/countBanksAndSkoks.ts";
 
 interface MonthlyFlaggedFact {
   month: string;
@@ -41,6 +42,9 @@ interface Facts {
   salesFacts: MonthlyFlaggedFact[]; // zestawienia 2-6 + korekty (miesiąc SPRZEDAŻY)
   itemMonthFacts: ItemMonthFact[]; // zestawienia 1, 7-11, 12 (miesiąc KALENDARZOWY)
   clientNames: Map<string, string>;
+  // Typ klienta istnieje wyłącznie w słowniku aplikacji (SPEC.md 16.b), nie w pliku -
+  // null w trybie --file oznacza "niedostępne", nie "brak banków" (zestawienie 16).
+  clientTypes: Map<string, string> | null;
 }
 
 function parseMonthArg(): string {
@@ -102,7 +106,7 @@ function factsFromFile(filePath: string): Facts {
     });
   }
 
-  return { salesFacts, itemMonthFacts, clientNames };
+  return { salesFacts, itemMonthFacts, clientNames, clientTypes: null };
 }
 
 async function factsFromDatabase(): Promise<Facts> {
@@ -145,20 +149,22 @@ async function factsFromDatabase(): Promise<Facts> {
   }
 
   const clientNames = new Map<string, string>();
+  const clientTypes = new Map<string, string>();
   if (nips.size > 0) {
     const { data: clients, error: clientsError } = await supabase
       .from("clients")
-      .select("nip, name")
+      .select("nip, name, type")
       .in("nip", Array.from(nips));
     if (clientsError) {
       throw new Error(`Błąd odczytu słownika klientów: ${clientsError.message}`);
     }
     for (const client of clients ?? []) {
       clientNames.set(client.nip, client.name);
+      clientTypes.set(client.nip, client.type);
     }
   }
 
-  return { salesFacts, itemMonthFacts, clientNames };
+  return { salesFacts, itemMonthFacts, clientNames, clientTypes };
 }
 
 function formatGrosze(grosze: number): string {
@@ -177,10 +183,12 @@ async function main() {
   const targetMonth = parseMonthArg();
   const filePath = parseFileArg();
 
-  const { salesFacts, itemMonthFacts, clientNames } = filePath ? factsFromFile(filePath) : await factsFromDatabase();
+  const { salesFacts, itemMonthFacts, clientNames, clientTypes } = filePath
+    ? factsFromFile(filePath)
+    : await factsFromDatabase();
   const source = filePath ? `plik ${filePath} (baza nie była dotykana)` : "baza Supabase";
 
-  console.log(`Zestawienia 1-12 (podgląd) - miesiąc ${targetMonth} - źródło: ${source}\n`);
+  console.log(`Zestawienia 1-12, 16 (podgląd) - miesiąc ${targetMonth} - źródło: ${source}\n`);
 
   const paying = aggregateMonthlyRevenuePerClient(
     itemMonthFacts.map((f) => ({ nip: f.nip, month: f.month, amountGrosze: f.monthlyAmountGrosze }))
@@ -204,6 +212,18 @@ async function main() {
     console.log(
       `${row.nip}\t${name}\tprzychód miesiąca: ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
     );
+  }
+
+  if (clientTypes === null) {
+    console.log(
+      "\n16. (niedostępne w trybie --file - typ klienta jest wyłącznie w słowniku aplikacji, nie w pliku źródłowym)"
+    );
+  } else {
+    const banksAndSkoks = countBanksAndSkoks(
+      report.map((row) => row.nip),
+      clientTypes
+    );
+    console.log(`\n16. Liczba banków/SKOK-ów wśród płacących klientów: ${banksAndSkoks}`);
   }
 }
 
