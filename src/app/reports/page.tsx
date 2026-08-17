@@ -2,10 +2,13 @@ import Link from "next/link";
 import { loadAvailableMonths, loadReportFacts } from "./data";
 import { buildMonthlySummary } from "@/lib/reports/buildMonthlySummary";
 import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthlyRevenueReport";
+import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContractsReport";
+import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
 import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
 import { formatGroszeAsDecimal } from "@/lib/import/formatGroszeAsDecimal";
 import { MonthSelect } from "./MonthSelect";
 import { ArchiveButton } from "./ArchiveButton";
+import { ClientReportTable } from "./ClientReportTable";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +56,11 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
     (a, b) => b.revenueGrosze - a.revenueGrosze
   );
   const banksAndSkoks = countBanksAndSkoks(clientReport.map((row) => row.nip), clientTypes);
+
+  const expiringEligible = isWithinExpiringHorizon(months, selectedMonth);
+  const expiringReport = expiringEligible
+    ? buildExpiringContractsReport(itemMonthFacts, selectedMonth).sort((a, b) => b.revenueGrosze - a.revenueGrosze)
+    : [];
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 bg-gray-50 px-4 py-12">
@@ -147,32 +155,31 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
         <h2 className="mb-4 text-lg font-semibold text-gray-900">
           12. Klienci z przychodem w miesiącu ({clientReport.length})
         </h2>
+        <ClientReportTable
+          rows={clientReport}
+          clientNames={clientNames}
+          revenueLabel="Przychód miesiąca"
+          emptyMessage="Brak klientów z przychodem w tym miesiącu."
+        />
+      </div>
 
-        {clientReport.length === 0 ? (
-          <p className="text-sm text-gray-500">Brak klientów z przychodem w tym miesiącu.</p>
+      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-lg font-semibold text-gray-900">
+          13. Klienci, których umowy wygasają w tym miesiącu {expiringEligible ? `(${expiringReport.length})` : ""}
+        </h2>
+        {expiringEligible ? (
+          <ClientReportTable
+            rows={expiringReport}
+            clientNames={clientNames}
+            revenueLabel="Wartość do utraty (miesiąc poprzedni)"
+            emptyMessage="Brak klientów, których umowy wygasają w tym miesiącu."
+          />
         ) : (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-gray-500">
-                <th className="py-2 font-medium">NIP</th>
-                <th className="py-2 font-medium">Nazwa</th>
-                <th className="py-2 font-medium">Przychód miesiąca</th>
-                <th className="py-2 font-medium">Suma faktur</th>
-                <th className="py-2 font-medium">Dokumenty</th>
-              </tr>
-            </thead>
-            <tbody>
-              {clientReport.map((row) => (
-                <tr key={row.nip} className="border-b border-gray-100 align-top">
-                  <td className="py-2">{row.nip}</td>
-                  <td className="py-2">{clientNames.get(row.nip) ?? "(nieznana nazwa)"}</td>
-                  <td className="py-2">{formatZl(row.revenueGrosze)}</td>
-                  <td className="py-2">{formatZl(row.invoiceTotalGrosze)}</td>
-                  <td className="py-2">{row.documentNumbers.join(", ")}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <p className="text-sm text-gray-500">
+            {months.length >= 3
+              ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca poprzedniego i następnego w danych (dostępne dla ${months[1]} – ${months[months.length - 2]}).`
+              : "Niedostępne — zestawienie wymaga co najmniej 3 miesięcy danych."}
+          </p>
         )}
       </div>
     </div>

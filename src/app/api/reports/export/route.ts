@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { loadAvailableMonths, loadReportFacts } from "@/app/reports/data";
-import { buildSummarySheetRows, buildClientsSheetRows } from "@/app/reports/export";
+import { buildSummarySheetRows, buildClientsSheetRows, buildExpiringSheetRows } from "@/app/reports/export";
 import { buildMonthlySummary } from "@/lib/reports/buildMonthlySummary";
 import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthlyRevenueReport";
+import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContractsReport";
+import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
 import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
 
 export async function GET(request: Request) {
@@ -35,6 +37,17 @@ export async function GET(request: Request) {
     XLSX.utils.aoa_to_sheet(buildClientsSheetRows(clientReport, clientNames)),
     "Zestawienie 12"
   );
+
+  if (isWithinExpiringHorizon(availableMonths, month)) {
+    const expiringReport = buildExpiringContractsReport(itemMonthFacts, month).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    XLSX.utils.book_append_sheet(
+      workbook,
+      XLSX.utils.aoa_to_sheet(buildExpiringSheetRows(expiringReport, clientNames)),
+      "Zestawienie 13"
+    );
+  }
 
   const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }) as Buffer;
 

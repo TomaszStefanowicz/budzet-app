@@ -1,15 +1,28 @@
 "use server";
 
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/service-role";
-import { loadReportFacts } from "./data";
+import { loadAvailableMonths, loadReportFacts } from "./data";
 import { buildMonthlySummary } from "@/lib/reports/buildMonthlySummary";
 import type { FlagBreakdown } from "@/lib/reports/sumByFlag";
 import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthlyRevenueReport";
+import type { ClientRevenueReportRow } from "@/lib/reports/buildClientMonthlyRevenueReport";
+import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContractsReport";
+import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
 import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
 import { formatGroszeAsDecimal } from "@/lib/import/formatGroszeAsDecimal";
 
 function zl(grosze: number): number {
   return Number(formatGroszeAsDecimal(grosze));
+}
+
+function toClientPayload(rows: ClientRevenueReportRow[], clientNames: Map<string, string>) {
+  return rows.map((row) => ({
+    nip: row.nip,
+    name: clientNames.get(row.nip) ?? null,
+    revenueZl: zl(row.revenueGrosze),
+    invoiceTotalZl: zl(row.invoiceTotalGrosze),
+    documentNumbers: row.documentNumbers,
+  }));
 }
 
 function breakdownToZl(breakdown: FlagBreakdown) {
@@ -46,28 +59,32 @@ export async function archiveReport(month: string): Promise<{ archivedAt: string
     throw new Error("Brak udanego importu — nie ma czego archiwizować.");
   }
 
-  const { salesFacts, itemMonthFacts, clientNames, clientTypes } = await loadReportFacts();
+  const [{ salesFacts, itemMonthFacts, clientNames, clientTypes }, availableMonths] = await Promise.all([
+    loadReportFacts(),
+    loadAvailableMonths(),
+  ]);
   const summary = buildMonthlySummary(salesFacts, itemMonthFacts, month);
   const clientReport = buildClientMonthlyRevenueReport(itemMonthFacts, month).sort(
     (a, b) => b.revenueGrosze - a.revenueGrosze
   );
   const banksAndSkoks = countBanksAndSkoks(clientReport.map((row) => row.nip), clientTypes);
 
-  const payload = {
+  const payload: Record<string, unknown> = {
     summary: {
       payingClientsCount: summary.payingClientsCount,
       salesBreakdownZl: breakdownToZl(summary.salesBreakdown),
       revenueBreakdownZl: breakdownToZl(summary.revenueBreakdown),
       banksAndSkoks,
     },
-    clients: clientReport.map((row) => ({
-      nip: row.nip,
-      name: clientNames.get(row.nip) ?? null,
-      revenueZl: zl(row.revenueGrosze),
-      invoiceTotalZl: zl(row.invoiceTotalGrosze),
-      documentNumbers: row.documentNumbers,
-    })),
+    clients: toClientPayload(clientReport, clientNames),
   };
+
+  if (isWithinExpiringHorizon(availableMonths, month)) {
+    const expiringReport = buildExpiringContractsReport(itemMonthFacts, month).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    payload.expiringClients = toClientPayload(expiringReport, clientNames);
+  }
 
   const { data: inserted, error: insertError } = await supabase
     .from("report_archive")

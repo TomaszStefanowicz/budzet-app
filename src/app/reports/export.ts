@@ -35,11 +35,12 @@ export function buildSummarySheetRows(summary: MonthlySummary, banksAndSkoks: nu
   ];
 }
 
-export function buildClientsSheetRows(
+function buildClientTableSheetRows(
   clientReport: ClientRevenueReportRow[],
-  clientNames: Map<string, string>
+  clientNames: Map<string, string>,
+  revenueLabel: string
 ): SheetCell[][] {
-  const header: SheetCell[] = ["NIP", "Nazwa", "Przychód miesiąca", "Suma faktur", "Dokumenty"];
+  const header: SheetCell[] = ["NIP", "Nazwa", revenueLabel, "Suma faktur", "Dokumenty"];
   const rows: SheetCell[][] = clientReport.map((row) => [
     row.nip,
     clientNames.get(row.nip) ?? "(nieznana nazwa)",
@@ -48,4 +49,18 @@ export function buildClientsSheetRows(
     row.documentNumbers.join(", "),
   ]);
   return [header, ...rows];
+}
+
+export function buildClientsSheetRows(
+  clientReport: ClientRevenueReportRow[],
+  clientNames: Map<string, string>
+): SheetCell[][] {
+  return buildClientTableSheetRows(clientReport, clientNames, "Przychód miesiąca");
+}
+
+export function buildExpiringSheetRows(
+  expiringReport: ClientRevenueReportRow[],
+  clientNames: Map<string, string>
+): SheetCell[][] {
+  return buildClientTableSheetRows(expiringReport, clientNames, "Wartość do utraty (miesiąc poprzedni)");
 }
