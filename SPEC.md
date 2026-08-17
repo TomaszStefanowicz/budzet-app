@@ -318,6 +318,8 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 
 39. **[UZUPEŁNIENIE, rozstrzyga P5] Eksport `.xlsx` (zadanie 3.4) to surowa tabela zestawienia z ekranu, bez odwzorowania układu dotychczasowych sprawozdań dla funduszy.** Sprawozdań referencyjnych jest kilka i każde ma inny układ kolumn, a część danych jest przekazywana poza tabelą, w komentarzu tekstowym — odwzorowanie jednego konkretnego formatu byłoby więc niewystarczające dla pozostałych i tak czy inaczej wymagałoby ręcznego uzupełnienia komentarza. Eksport ma dać dane w formie kopiowalnej do arkusza (VI.5), nie gotowy dokument sprawozdania.
 
+40. **[UZUPEŁNIENIE, rozstrzyga P1] Archiwum zestawień (`report_archive`, zadanie 4.1) to ręczna migawka, nie mechanizm ponownego liczenia.** Zestawienia są i pozostają liczone na żądanie z aktywnych pozycji (jak w 3.3) — to zawsze możliwe, bo import jest całościowy i zawiera pełną historię. Archiwum służy wyłącznie do przywołania „co konkretnie zostało wysłane do funduszu i kiedy", nawet jeśli dane źródłowe później się zmienią (korekty) — zapis obejmuje `import_id`, miesiąc, znacznik czasu i migawkę wyliczonych liczb (`payload` jsonb: zestawienia 1–11+16 i lista 12). Wywoływane ręcznie przyciskiem na ekranie zestawień, nie automatycznie przy imporcie. **Przeglądanie zapisanych migawek świadomie poza zakresem tej wersji aplikacji** — odczyt przez panel podglądu danych Supabase (CLAUDE.md pkt 4), do rozważenia jako osobna funkcja w przyszłości.
+
 ---
 
 ## VI. [UZUPEŁNIENIE] Wymagania niefunkcjonalne

@@ -5,6 +5,7 @@ import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthl
 import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
 import { formatGroszeAsDecimal } from "@/lib/import/formatGroszeAsDecimal";
 import { MonthSelect } from "./MonthSelect";
+import { ArchiveButton } from "./ArchiveButton";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +67,7 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
           >
             Eksportuj do .xlsx
           </a>
+          <ArchiveButton month={selectedMonth} />
           <MonthSelect months={months} selected={selectedMonth} />
         </div>
       </div>

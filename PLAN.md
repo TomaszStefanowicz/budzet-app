@@ -81,7 +81,7 @@ Cel: serce aplikacji. To tu kryje się największe ryzyko z decyzji V.5 — „p
 
 ## Etap 4 — Domknięcie i bufor (dni 12–14)
 
-- [ ] **4.1** Archiwum wygenerowanych zestawień (`SPEC.md` IV.3), w tym migracja SQL dla tabeli `report_archive`.
+- [x] **4.1** Archiwum wygenerowanych zestawień (`SPEC.md` IV.3), w tym migracja SQL dla tabeli `report_archive`. → migracja `20260817140000` (kolumny: `import_id`, `month`, `generated_at`, `payload` jsonb). Przycisk „Zapisz do archiwum" na `/reports` (server action `archiveReport`) zapisuje migawkę (zestawienia 1–11+16 i lista 12) powiązaną z ostatnim udanym importem. Przeglądanie archiwum świadomie poza zakresem tej wersji (ustalone z użytkownikiem) — odczyt przez panel podglądu danych Supabase. Zweryfikowane ręcznie: zapis, potwierdzenie na ekranie, zawartość wiersza w bazie zgodna z ekranem.
 - [ ] **4.2** Instancja demo: zasilenie danymi syntetycznymi, uzupełniony słownik, wygenerowane zestawienia — organizator po zalogowaniu widzi działający produkt, nie pustą bazę.
 - [ ] **4.3** Konto dla organizatorów kursu.
 - [ ] **4.4** `README.md`: co to jest, link do aplikacji, dane logowania demo, stack, jak uruchomić lokalnie, uwaga o danych syntetycznych.
@@ -95,7 +95,7 @@ Cel: serce aplikacji. To tu kryje się największe ryzyko z decyzji V.5 — „p
 
 Do rozstrzygnięcia w trakcie; każde rozstrzygnięcie dopisujemy do rejestru decyzji w `SPEC.md`.
 
-- [ ] **P1** Czy zestawienia mają być liczone na żądanie, czy zapisywane do archiwum przy imporcie? (Wpływa na 4.1. Rekomendacja: liczone na żądanie, archiwum jako zapis migawki.)
+- [x] **P1** Czy zestawienia mają być liczone na żądanie, czy zapisywane do archiwum przy imporcie? → **Rozstrzygnięte:** liczone na żądanie (już tak działa w 3.3); archiwum (4.1) to osobna, ręczna migawka „co zostało wysłane i kiedy", nie mechanizm ponownego liczenia. Przeglądanie archiwum poza zakresem tej wersji.
 - [x] **P2** Czy pierwszy wers pliku to zawsze nagłówek z nazwami miesięcy w formacie rozpoznawalnym maszynowo? Jeśli nie — zakres miesięcy trzeba wykrywać po pozycji kolumny J = styczeń 2024 i liczyć w przód. → **Rozstrzygnięte:** plik importowy ma zawsze dokładnie jeden wiersz nagłówkowy; zakres miesięcy wykrywany wyłącznie pozycyjnie (patrz `SPEC.md` V.23).
 - [ ] **P3** Co z klientem, który zmienił NIP (przekształcenie spółki)? Dziś: dwaj różni klienci. Czy to akceptowalne?
 - [ ] **P4** Czy w zestawieniu 13 interesują Cię tylko wygaśnięcia w oknie „bieżący miesiąc + 3", czy dowolny miesiąc historyczny do analizy?
