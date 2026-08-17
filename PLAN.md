@@ -85,7 +85,7 @@ Cel: serce aplikacji. To tu kryje się największe ryzyko z decyzji V.5 — „p
 - [x] **4.2** Instancja demo: zasilenie danymi syntetycznymi, uzupełniony słownik, wygenerowane zestawienia — organizator po zalogowaniu widzi działający produkt, nie pustą bazę. → Dane syntetyczne już były zaimportowane (Etap 1/2). Uzupełniono tylko słownik (500 klientów: 50 bank, 25 SKOK, 325 inny, 100 nieokreślony — proporcja demonstracyjna, nie biznesowa), operacja bezpośrednio na bazie (dane syntetyczne, odwracalne, za zgodą użytkownika). Zestawienie 16 dla marca 2026 pokazuje teraz 46 (zamiast 0) — zweryfikowane ręcznie.
 - [ ] **4.3** Konto dla organizatorów kursu.
 - [x] **4.4** `README.md`: co to jest, link do aplikacji, dane logowania demo, stack, jak uruchomić lokalnie, uwaga o danych syntetycznych. → Sekcja „Dane logowania" oznaczona jako do uzupełnienia — zależy od 4.3 (odłożone).
-- [ ] **4.5** Dokumentacja procesu na zaliczenie: jak wyglądała praca z Claude Code, co wynikło ze specyfikacji, jakie decyzje zmieniły się w trakcie.
+- [ ] **4.5** [ODŁOŻONE NA KONIEC] Retrospektywa procesu tworzenia oprogramowania — nie jest wymagana do zaliczenia, to podsumowanie dla użytkownika (jak wyglądała praca z Claude Code, co wynikło ze specyfikacji, jakie decyzje zmieniły się w trakcie). Materiał już częściowo istnieje w dzienniku poniżej i w rejestrze decyzji `SPEC.md` V — do spisania na końcu prac.
 - [ ] **4.6** Odpauzowanie Supabase i sprawdzenie linku **dzień przed** oddaniem (`SPEC.md` VI.7).
 - [ ] **4.7** Bufor na poprawki. **Nienegocjowalny — coś zawsze się przesunie.**
 
