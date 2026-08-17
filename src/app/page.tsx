@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/service-role";
 import { signOut } from "./actions";
@@ -27,14 +28,19 @@ export default async function Home() {
         <p className="text-gray-700">
           Zalogowano jako <span className="font-medium">{user?.email}</span>
         </p>
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-          >
-            Wyloguj
-          </button>
-        </form>
+        <div className="flex items-center gap-4">
+          <Link href="/clients" className="text-sm text-gray-600 hover:underline">
+            Słownik klientów
+          </Link>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+            >
+              Wyloguj
+            </button>
+          </form>
+        </div>
       </div>
 
       <UploadForm />
