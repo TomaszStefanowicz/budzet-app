@@ -71,7 +71,7 @@ Cel: serce aplikacji. To tu kryje się największe ryzyko z decyzji V.5 — „p
 
 - [x] **3.1** Ekran importu: upload, historia importów z metrykami, czytelny raport błędów. → zrealizowane już w zadaniu 1.7, kryterium spełnione bez dodatkowej pracy.
 - [x] **3.2** Słownik klientów: lista, edycja typu (bank / SKOK / inny), **wyróżnienie klientów z typem „nieokreślony"**. → `/clients`: tabela z licznikiem nieuzupełnionych typów, edycja przez `<select>` (server action `updateClientType`, `revalidatePath`), wiersze „nieokreślony" podświetlone. Zweryfikowane ręcznie lokalnie na współdzielonej bazie: zmiana zapisuje się i przeżywa odświeżenie strony, licznik się aktualizuje.
-- [ ] **3.3** Widoki zestawień: wybór miesiąca, tabele, listy klientów w zestawieniach 12–16.
+- [x] **3.3** Widoki zestawień: wybór miesiąca, tabele, listy klientów w zestawieniach 12–16. → `/reports`: wybór miesiąca z zakresu wykrytego w ostatnim udanym imporcie (domyślnie miesiąc bieżący, jeśli w zakresie, inaczej ostatni dostępny), tabela zestawień 1–11 + 16, lista zestawienia 12 (NIP, nazwa, przychód miesiąca, suma faktur, dokumenty). Nowa czysta funkcja `buildMonthlySummary` (1–11) z testami — reszta reużywa istniejące funkcje z Etapu 2 (`buildClientMonthlyRevenueReport`, `countBanksAndSkoks`). Zestawienia 13–15 poza zakresem (odłożone w 2.4/2.5). Zweryfikowane ręcznie lokalnie: domyślny miesiąc, przełączanie miesiąca (URL `?month=`), liczby niezerowe i zgodne z rzędem wielkości z wcześniejszego backtestu (2.7).
 - [ ] **3.4** Eksport zestawień do `.xlsx` (`SPEC.md` VI.5).
 - [ ] **3.5** Nawigacja, komunikaty stanu, obsługa błędów w interfejsie.
 

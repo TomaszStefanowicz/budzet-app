@@ -29,6 +29,9 @@ export default async function Home() {
           Zalogowano jako <span className="font-medium">{user?.email}</span>
         </p>
         <div className="flex items-center gap-4">
+          <Link href="/reports" className="text-sm text-gray-600 hover:underline">
+            Zestawienia
+          </Link>
           <Link href="/clients" className="text-sm text-gray-600 hover:underline">
             Słownik klientów
           </Link>
