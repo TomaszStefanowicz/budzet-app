@@ -59,7 +59,15 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
         <Link href="/" className="text-sm text-gray-600 hover:underline">
           ← Powrót do importu
         </Link>
-        <MonthSelect months={months} selected={selectedMonth} />
+        <div className="flex items-center gap-3">
+          <a
+            href={`/api/reports/export?month=${selectedMonth}`}
+            className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100"
+          >
+            Eksportuj do .xlsx
+          </a>
+          <MonthSelect months={months} selected={selectedMonth} />
+        </div>
       </div>
 
       <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">

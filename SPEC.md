@@ -316,6 +316,8 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 
 38. **[ZMIENIONE, koryguje III.A.1] Usunięto wymóg „suma kolumn F–I > 0" z definicji zestawienia 1 — nieaktualna nieścisłość odziedziczona z dawnej praktyki ręcznej.** Dotyczyła sposobu unieważniania korekty w budżecie: zamiast usuwać wers, zerowano kwotę i **czyszczono też jedynkę w kolumnach F–I** (wers zostawał bez żadnej flagi). „Suma F–I > 0" była więc w praktyce sprawdzeniem „czy ten wers nie został tak unieważniony", nie regułą o wysokości przychodu. Użytkownik potwierdził, że ten wyjątek został już poprawiony w budżecie — każda pozycja ma dziś dokładnie jedną flagę w F–I (zgodnie zresztą z zasadą twardą walidacji importu, II.3.a/b). Wymóg jest więc nieaktualny i usunięty z dokumentacji; zestawienie 1 liczy się tym samym kryterium co 11a (zagregowany przychód miesiąca > 0) i może reużywać tej samej warstwy agregacji (`aggregateMonthlyRevenuePerClient`, zadanie 2.1).
 
+39. **[UZUPEŁNIENIE, rozstrzyga P5] Eksport `.xlsx` (zadanie 3.4) to surowa tabela zestawienia z ekranu, bez odwzorowania układu dotychczasowych sprawozdań dla funduszy.** Sprawozdań referencyjnych jest kilka i każde ma inny układ kolumn, a część danych jest przekazywana poza tabelą, w komentarzu tekstowym — odwzorowanie jednego konkretnego formatu byłoby więc niewystarczające dla pozostałych i tak czy inaczej wymagałoby ręcznego uzupełnienia komentarza. Eksport ma dać dane w formie kopiowalnej do arkusza (VI.5), nie gotowy dokument sprawozdania.
+
 ---
 
 ## VI. [UZUPEŁNIENIE] Wymagania niefunkcjonalne
