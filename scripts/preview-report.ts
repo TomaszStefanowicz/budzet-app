@@ -1,8 +1,8 @@
 /**
  * Skrypt pomocniczy do ręcznej weryfikacji silnika zestawień w trakcie budowy
  * Etapu 2 (SPEC.md III) - zanim powstanie właściwy ekran (Etap 3, zadanie 3.3).
- * Nie jest to produkcyjny kod zestawień - brak numerów faktur (12), brak testów
- * tego pliku. Tylko podgląd "na oko" do porównania z Excelem.
+ * Nie jest to produkcyjny kod zestawień - brak testów tego pliku. Tylko podgląd
+ * "na oko" do porównania z Excelem.
  *
  * Dwa tryby źródła danych:
  *   --month=rrrr-mm                          odczyt z bazy Supabase (dane demo/produkcyjne)
@@ -27,18 +27,20 @@ import { formatMonthDate } from "../src/lib/import/formatMonthDate.ts";
 import { singleFlagLetter } from "../src/lib/import/buildRevenueItemRow.ts";
 import { parseDecimalToGrosze } from "../src/lib/reports/parseDecimalToGrosze.ts";
 import { aggregateMonthlyRevenuePerClient } from "../src/lib/reports/aggregateMonthlyRevenuePerClient.ts";
-import type { RevenueFact } from "../src/lib/reports/aggregateMonthlyRevenuePerClient.ts";
 import { sumByFlag } from "../src/lib/reports/sumByFlag.ts";
-import type { FlaggedFact } from "../src/lib/reports/sumByFlag.ts";
+import { buildClientMonthlyRevenueReport } from "../src/lib/reports/buildClientMonthlyRevenueReport.ts";
+import type { ItemMonthFact } from "../src/lib/reports/buildClientMonthlyRevenueReport.ts";
 
-interface MonthlyFlaggedFact extends FlaggedFact {
+interface MonthlyFlaggedFact {
   month: string;
+  flag: "F" | "G" | "H" | "I" | null;
+  amountGrosze: number;
 }
 
 interface Facts {
-  clientFacts: RevenueFact[]; // zestawienie 1, 12 (nip, miesiąc kalendarzowy, kwota)
   salesFacts: MonthlyFlaggedFact[]; // zestawienia 2-6 + korekty (miesiąc SPRZEDAŻY)
-  revenueFacts: MonthlyFlaggedFact[]; // zestawienia 7-11 + korekty (miesiąc KALENDARZOWY)
+  itemMonthFacts: ItemMonthFact[]; // zestawienia 1, 7-11, 12 (miesiąc KALENDARZOWY)
+  clientNames: Map<string, string>;
 }
 
 function parseMonthArg(): string {
@@ -77,24 +79,30 @@ function factsFromFile(filePath: string): Facts {
 
   const { rows } = parseSalesRows(rawRows);
 
-  const clientFacts: RevenueFact[] = [];
   const salesFacts: MonthlyFlaggedFact[] = [];
-  const revenueFacts: MonthlyFlaggedFact[] = [];
+  const itemMonthFacts: ItemMonthFact[] = [];
+  const clientNames = new Map<string, string>();
 
   for (const row of rows) {
     const flag = singleFlagLetter(row.flags);
+    clientNames.set(row.nip, row.clientName); // ostatnie wystąpienie wygrywa (SPEC.md V.35)
 
     salesFacts.push({ month: formatMonthDate(row.saleMonth), flag, amountGrosze: row.netAmountGrosze });
 
-    row.monthlyAmountsGrosze.forEach((amountGrosze, index) => {
-      if (amountGrosze === 0) return;
-      const month = formatMonthDate(monthIndexToDate(index));
-      clientFacts.push({ nip: row.nip, month, amountGrosze });
-      revenueFacts.push({ month, flag, amountGrosze });
+    row.monthlyAmountsGrosze.forEach((monthlyAmountGrosze, index) => {
+      if (monthlyAmountGrosze === 0) return;
+      itemMonthFacts.push({
+        nip: row.nip,
+        flag,
+        documentNumber: row.documentNumber,
+        invoiceNetAmountGrosze: row.netAmountGrosze,
+        month: formatMonthDate(monthIndexToDate(index)),
+        monthlyAmountGrosze,
+      });
     });
   }
 
-  return { clientFacts, salesFacts, revenueFacts };
+  return { salesFacts, itemMonthFacts, clientNames };
 }
 
 async function factsFromDatabase(): Promise<Facts> {
@@ -107,31 +115,50 @@ async function factsFromDatabase(): Promise<Facts> {
 
   const { data, error } = await supabase
     .from("revenue_items")
-    .select("nip, flag, sale_month, net_amount, revenue_months(month, amount)")
+    .select("nip, flag, sale_month, document_number, net_amount, revenue_months(month, amount)")
     .eq("is_active", true);
 
   if (error) {
     throw new Error(`Błąd odczytu z bazy: ${error.message}`);
   }
 
-  const clientFacts: RevenueFact[] = [];
   const salesFacts: MonthlyFlaggedFact[] = [];
-  const revenueFacts: MonthlyFlaggedFact[] = [];
+  const itemMonthFacts: ItemMonthFact[] = [];
+  const nips = new Set<string>();
 
   for (const item of data ?? []) {
-    salesFacts.push({
-      month: item.sale_month,
-      flag: item.flag,
-      amountGrosze: parseDecimalToGrosze(item.net_amount),
-    });
+    nips.add(item.nip);
+    const invoiceNetAmountGrosze = parseDecimalToGrosze(item.net_amount);
+
+    salesFacts.push({ month: item.sale_month, flag: item.flag, amountGrosze: invoiceNetAmountGrosze });
+
     for (const rm of item.revenue_months ?? []) {
-      const amountGrosze = parseDecimalToGrosze(rm.amount);
-      clientFacts.push({ nip: item.nip, month: rm.month, amountGrosze });
-      revenueFacts.push({ month: rm.month, flag: item.flag, amountGrosze });
+      itemMonthFacts.push({
+        nip: item.nip,
+        flag: item.flag,
+        documentNumber: item.document_number,
+        invoiceNetAmountGrosze,
+        month: rm.month,
+        monthlyAmountGrosze: parseDecimalToGrosze(rm.amount),
+      });
     }
   }
 
-  return { clientFacts, salesFacts, revenueFacts };
+  const clientNames = new Map<string, string>();
+  if (nips.size > 0) {
+    const { data: clients, error: clientsError } = await supabase
+      .from("clients")
+      .select("nip, name")
+      .in("nip", Array.from(nips));
+    if (clientsError) {
+      throw new Error(`Błąd odczytu słownika klientów: ${clientsError.message}`);
+    }
+    for (const client of clients ?? []) {
+      clientNames.set(client.nip, client.name);
+    }
+  }
+
+  return { salesFacts, itemMonthFacts, clientNames };
 }
 
 function formatGrosze(grosze: number): string {
@@ -150,24 +177,34 @@ async function main() {
   const targetMonth = parseMonthArg();
   const filePath = parseFileArg();
 
-  const { clientFacts, salesFacts, revenueFacts } = filePath ? factsFromFile(filePath) : await factsFromDatabase();
+  const { salesFacts, itemMonthFacts, clientNames } = filePath ? factsFromFile(filePath) : await factsFromDatabase();
   const source = filePath ? `plik ${filePath} (baza nie była dotykana)` : "baza Supabase";
 
   console.log(`Zestawienia 1-12 (podgląd) - miesiąc ${targetMonth} - źródło: ${source}\n`);
 
-  const paying = aggregateMonthlyRevenuePerClient(clientFacts).filter((row) => row.month === targetMonth);
+  const paying = aggregateMonthlyRevenuePerClient(
+    itemMonthFacts.map((f) => ({ nip: f.nip, month: f.month, amountGrosze: f.monthlyAmountGrosze }))
+  ).filter((row) => row.month === targetMonth);
   console.log(`1. Liczba klientów, którzy zapłacili: ${paying.length}`);
 
   const salesBreakdown = sumByFlag(salesFacts.filter((f) => f.month === targetMonth));
   printBreakdown("2-6. Wartość sprzedaży w miesiącu", salesBreakdown);
 
-  const revenueBreakdown = sumByFlag(revenueFacts.filter((f) => f.month === targetMonth));
+  const revenueBreakdown = sumByFlag(
+    itemMonthFacts.filter((f) => f.month === targetMonth).map((f) => ({ flag: f.flag, amountGrosze: f.monthlyAmountGrosze }))
+  );
   printBreakdown("7-11. Wartość przychodów w miesiącu", revenueBreakdown);
 
-  console.log(`\n12. Lista klientów z przychodem > 0 (${paying.length}):`);
-  paying
-    .sort((a, b) => b.totalGrosze - a.totalGrosze)
-    .forEach((row) => console.log(`${row.nip}\t${formatGrosze(row.totalGrosze)}`));
+  const report = buildClientMonthlyRevenueReport(itemMonthFacts, targetMonth).sort(
+    (a, b) => b.revenueGrosze - a.revenueGrosze
+  );
+  console.log(`\n12. Lista klientów z przychodem > 0 (${report.length}):`);
+  for (const row of report) {
+    const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
+    console.log(
+      `${row.nip}\t${name}\tprzychód miesiąca: ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
+    );
+  }
 }
 
 main().catch((err) => {
