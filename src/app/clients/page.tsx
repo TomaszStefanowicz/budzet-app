@@ -15,13 +15,13 @@ export default async function ClientsPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-5xl">
         <Link href="/" className="text-sm text-gray-600 hover:underline">
           ← Powrót do importu
         </Link>
       </div>
 
-      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="w-full max-w-5xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
         <h1 className="mb-1 text-xl font-bold text-gray-900">Słownik klientów</h1>
 
         {unresolvedCount > 0 && (

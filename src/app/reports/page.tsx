@@ -31,12 +31,12 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
   if (months.length === 0) {
     return (
       <div className="flex min-h-screen flex-col items-center gap-8 bg-gray-50 px-4 py-12">
-        <div className="w-full max-w-3xl">
+        <div className="w-full max-w-6xl">
           <Link href="/" className="text-sm text-gray-600 hover:underline">
             ← Powrót do importu
           </Link>
         </div>
-        <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="w-full max-w-6xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
           <h1 className="mb-1 text-xl font-bold text-gray-900">Zestawienia</h1>
           <p className="text-sm text-gray-500">Brak danych — zaimportuj plik sprzedażowy.</p>
         </div>
@@ -76,7 +76,7 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 bg-gray-50 px-4 py-12">
-      <div className="flex w-full max-w-3xl items-center justify-between">
+      <div className="flex w-full max-w-6xl items-center justify-between">
         <Link href="/" className="text-sm text-gray-600 hover:underline">
           ← Powrót do importu
         </Link>
@@ -92,7 +92,7 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
         </div>
       </div>
 
-      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="w-full max-w-6xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
         <h1 className="mb-4 text-xl font-bold text-gray-900">Zestawienia 1–11, 16</h1>
 
         <table className="w-full text-left text-sm">
@@ -163,7 +163,7 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
         </table>
       </div>
 
-      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="w-full max-w-6xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
         <h2 className="mb-4 text-xl font-bold text-gray-900">
           12. Klienci z przychodem w miesiącu ({clientReport.length})
         </h2>
