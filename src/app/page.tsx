@@ -67,9 +67,9 @@ export default async function Home() {
                 <tr className="sticky top-0 z-10 border-b border-gray-200 bg-white text-gray-500">
                   <th className="py-2 font-medium">Data importu</th>
                   <th className="py-2 font-medium">Plik</th>
-                  <th className="py-2 text-right font-medium">Liczba wersów</th>
-                  <th className="py-2 font-medium">Zakres miesięcy</th>
-                  <th className="py-2 font-medium">Wynik</th>
+                  <th className="py-2 text-center font-medium">Liczba wersów</th>
+                  <th className="py-2 text-center font-medium">Zakres miesięcy</th>
+                  <th className="py-2 text-center font-medium">Wynik</th>
                 </tr>
               </thead>
               <tbody>
@@ -79,9 +79,9 @@ export default async function Home() {
                       {new Date(row.imported_at).toLocaleString("pl-PL")}
                     </td>
                     <td className="py-2">{row.file_name}</td>
-                    <td className="py-2 text-right">{row.row_count}</td>
-                    <td className="py-2">{formatMonthRange(row.detected_month_from, row.detected_month_to)}</td>
-                    <td className="py-2">
+                    <td className="py-2 text-center">{row.row_count}</td>
+                    <td className="py-2 text-center">{formatMonthRange(row.detected_month_from, row.detected_month_to)}</td>
+                    <td className="py-2 text-center">
                       <StatusBadge status={row.validation_status === "sukces" ? "sukces" : "błąd"} />
                     </td>
                   </tr>
