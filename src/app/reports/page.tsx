@@ -52,7 +52,8 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
         ? currentMonthDate()
         : months[months.length - 1];
 
-  const { salesFacts, itemMonthFacts, clientNames, clientTypes } = await loadReportFacts();
+  const { salesFacts, itemMonthFacts, clientNames: clientNamesMap, clientTypes } = await loadReportFacts();
+  const clientNames = Object.fromEntries(clientNamesMap);
 
   const summary = buildMonthlySummary(salesFacts, itemMonthFacts, selectedMonth);
   const clientReport = buildClientMonthlyRevenueReport(itemMonthFacts, selectedMonth).sort(

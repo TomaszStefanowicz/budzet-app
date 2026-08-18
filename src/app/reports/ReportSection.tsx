@@ -13,7 +13,7 @@ export function ReportSection({
   title: string;
   eligible: boolean;
   rows: ClientRevenueReportRow[];
-  clientNames: Map<string, string>;
+  clientNames: Record<string, string>;
   revenueLabel: string;
   emptyMessage: string;
   unavailableMessage: string;
