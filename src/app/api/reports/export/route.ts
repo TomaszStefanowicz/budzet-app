@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { loadAvailableMonths, loadReportFacts } from "@/app/reports/data";
-import { buildSummarySheetRows, buildClientsSheetRows, buildExpiringSheetRows } from "@/app/reports/export";
+import {
+  buildSummarySheetRows,
+  buildClientsSheetRows,
+  buildExpiringSheetRows,
+  buildPackageStartSheetRows,
+} from "@/app/reports/export";
 import { buildMonthlySummary } from "@/lib/reports/buildMonthlySummary";
 import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthlyRevenueReport";
 import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContractsReport";
 import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
+import { buildPackageStartReport } from "@/lib/reports/buildPackageStartReport";
+import { isWithinPackageStartHorizon } from "@/lib/reports/packageStartHorizon";
 import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
 
 export async function GET(request: Request) {
@@ -46,6 +53,26 @@ export async function GET(request: Request) {
       workbook,
       XLSX.utils.aoa_to_sheet(buildExpiringSheetRows(expiringReport, clientNames)),
       "Zestawienie 13"
+    );
+  }
+
+  if (isWithinPackageStartHorizon(availableMonths, month)) {
+    const newClientsReport = buildPackageStartReport(itemMonthFacts, "F", month).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    XLSX.utils.book_append_sheet(
+      workbook,
+      XLSX.utils.aoa_to_sheet(buildPackageStartSheetRows(newClientsReport, clientNames)),
+      "Zestawienie 14"
+    );
+
+    const renewalStartsReport = buildPackageStartReport(itemMonthFacts, "G", month).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    XLSX.utils.book_append_sheet(
+      workbook,
+      XLSX.utils.aoa_to_sheet(buildPackageStartSheetRows(renewalStartsReport, clientNames)),
+      "Zestawienie 15"
     );
   }
 

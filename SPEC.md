@@ -186,11 +186,11 @@ e) **[UZUPEŁNIENIE]** Klient, którego seria przychodów obejmuje tylko miesią
 
 f) **[ZMIENIONE, koryguje a) i b) — decyzja V.43]** Test „brak przychodu w M+1" (jak w pierwotnej definicji i procedurze ręcznej b) zastąpiony testem **„brak przychodu w JAKIMKOLWIEK miesiącu po M, aż do końca dostępnych danych"**. Rozliczenie międzyokresowe opiera się na dacie faktycznego dostępu do systemu wskazanej na fakturze, nie na dacie jej wystawienia — klienci czasem przedłużają z opóźnieniem (po utracie dostępu, gdy negocjacje/płatność trwały dłużej) albo ze świadomą, zaplanowaną przerwą w dostępie, mimo że umowę przedłużającą zawierają jeszcze przed wygaśnięciem starej albo bezpośrednio po nim. Sprawdzanie wyłącznie M+1 błędnie wykazywałoby takich klientów jako nadal niedziałających, mimo że w danych już widać ich przedłużenie (z dowolnie odległym miesiącem startu, nie tylko M+1). Reguła horyzontu z pkt d) nie ulega zmianie — wciąż wymaga istnienia M−1 (żeby odróżnić prawdziwe wygaśnięcie od jednomiesięcznego początku, pkt e) oraz co najmniej jednego miesiąca po M (żeby "dotychczas nie przedłużyli" było twierdzeniem o czymś, a nie pustym zakresem).
 
-#### 14. Liczba i lista nowych klientów, których realizacja umów rozpoczyna się w danym miesiącu
+#### 14. [ZMIENIONE, patrz d) i V.44] Liczba i lista nowych klientów, których pakiet (flaga F) zaczyna się w danym miesiącu
 
-a) **Definicja:** liczba klientów (per NIP) z przychodami rozliczanymi międzyokresowo, rozpoczynającymi się w odpowiednim miesiącu, z flagą F, po wykluczeniu klientów powtarzających się.
+a) **Definicja:** liczba klientów (per NIP), których wers z flagą F ma pierwszy niezerowy przychód (w rozbiciu miesięcznym) w odpowiednim miesiącu, po wykluczeniu klientów powtarzających się.
 
-b) **Procedura referencyjna (dotychczasowa, ręczna):**
+b) **Procedura referencyjna (dotychczasowa, ręczna — zastąpiona w aplikacji, patrz d):**
    1. kopiowanie danych do odrębnego arkusza z usunięciem formuł,
    2. usunięcie zbędnych kolumn,
    3. wysortowanie wszystkich wersów z flagą F,
@@ -199,15 +199,19 @@ b) **Procedura referencyjna (dotychczasowa, ręczna):**
    6. usunięcie zbędnych wersów,
    7. wyszukanie powtarzających się numerów NIP i usunięcie odpowiednich wersów.
 
-c) **[UZUPEŁNIENIE]** Analogicznie do pkt 13.d obowiązuje reguła horyzontu: kryterium wymaga istnienia miesięcy M−1 i M+1, więc zestawienie liczone jest dla M od drugiego do przedostatniego miesiąca danych.
+c) **[ZMIENIONE, koryguje pierwotne brzmienie c)] Reguła horyzontu wymaga wyłącznie M+1** (do policzenia wartości, patrz d) — **nie M−1**: flaga F jest już zwalidowana przy imporcie względem całej widocznej historii klienta (`validateFlagContinuity`), więc nawet pierwszy miesiąc całego zakresu danych może być poprawnie zgłoszony. Niedostępny jest wyłącznie ostatni miesiąc zakresu.
 
-#### 15. Liczba i lista klientów przedłużających, których realizacja przedłużeń rozpoczyna się w danym miesiącu
+d) **[UZUPEŁNIENIE, decyzja V.44]** Kwalifikacja NIE jest liczona z agregatu „brak przychodu w M−1, jest w M i M+1" (jak w pierwotnej procedurze b) — to powtórzyłoby błąd znaleziony w zestawieniu 13 (V.43), tylko po stronie startu: klient może mieć pojedynczy miesiąc pakietu F/G, po którym nastąpi przerwa, zanim kolejny pakiet ruszy (od 2026 flagi F/G nie wymagają już ≥2 miesięcy, decyzja V.29) — długość takiej przerwy nie ma znaczenia dla klasyfikacji, o niej decyduje wyłącznie flaga. Zamiast agregatu: dla każdego wersu z flagą F sprawdzany jest najwcześniejszy miesiąc z niezerową kwotą w jego własnym rozbiciu miesięcznym — jeśli to miesiąc M, klient jest „nowy od M". Wartość i faktury pochodzą z **M+1** (pierwszy pełny miesiąc — symetrycznie do 13.b.v, które z tego samego powodu używa M−1); jeśli pakiet jest jednomiesięczny i nie ma kontynuacji w M+1, wartość wynosi 0 (klient wciąż jest wykazywany jako „nowy od M", tylko bez kwoty). **Świadomie potwierdzone z użytkownikiem:** klient z cykliczną, comiesięczną fakturą (osobny wers co miesiąc, każdy pokrywający tylko swój miesiąc — np. MiŚOT S.A. w danych testowych) poprawnie pojawia się w tym zestawieniu **każdego** miesiąca, nie jest to błąd/szum — taki klient faktycznie podejmuje decyzję o przedłużeniu co miesiąc, więc powinien być tak wykazywany.
 
-a) **Definicja:** jak w pkt 14, z flagą G zamiast F.
+#### 15. [ZMIENIONE, patrz 14.d] Liczba i lista klientów przedłużających, których przedłużenie (flaga G) zaczyna się w danym miesiącu
 
-b) **Procedura referencyjna:** jak w pkt 14.b, z flagą G w kroku (iii).
+a) **Definicja:** jak w pkt 14a, z flagą G zamiast F.
 
-c) **[UZUPEŁNIENIE]** Obowiązuje reguła horyzontu jak w pkt 14.c.
+b) **Procedura referencyjna:** jak w pkt 14b, z flagą G w kroku (iii) — zastąpiona w aplikacji jak w 14d.
+
+c) Reguła horyzontu jak w pkt 14c (wymaga wyłącznie M+1).
+
+d) Kwalifikacja i wartość jak w pkt 14d, z flagą G zamiast F.
 
 #### 16. Liczba banków będących klientami
 
@@ -327,6 +331,8 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 42. **[UZUPEŁNIENIE, doprecyzowuje 11a dla zestawienia 13] Wykluczenie flagi I z serii zestawień 13–15 obejmuje całość wyniku, nie tylko test kwalifikujący klienta jako wygasającego/startującego.** Potwierdzone z użytkownikiem przy implementacji zestawienia 13 (zadanie 2.4): jeśli klient ma w miesiącu M−1 (lub M) niezwiązany zakup incydentalny (flaga I) obok wygasającego pakietu F/G/H, kwota tego zakupu incydentalnego **nie** wchodzi do wykazywanej „wartości do utraty" ani do sumy/listy faktur — analogicznie nie może też sztucznie zamaskować wygaśnięcia, gdyby wystąpiła w M+1. Uzasadnienie: zakup incydentalny to jednorazowa, niezwiązana transakcja (z definicji w II.2), nie część pakietu podlegającego wygaśnięciu/odnowieniu — wliczenie go zniekształcałoby sens „wartości utraconej z powodu wygaśnięcia konkretnego pakietu". Zaimplementowane w `buildExpiringContractsReport.ts` przez filtrowanie `flag !== "I"` na wejściu, przed jakimkolwiek innym przetwarzaniem.
 
 43. **[ZMIENIONE, koryguje III.B.13.a i b] Zestawienie 13 sprawdza brak przychodu w KAŻDYM miesiącu po M, nie tylko w M+1 — bo wygasła umowa i przedłużenie z opóźnieniem to różne rzeczy.** Ujawnione backtestem na `local-data/Sprzedaz.xlsx` dla maja 2026 (dwa przykłady: Salumanus Sp. z o.o. i Wschodni Bank Spółdzielczy w Chełmie) — obaj klienci mieli realną, jednomiesięczną przerwę w przychodzie w czerwcu 2026 (nie błąd danych/formuły — rozliczenie międzyokresowe opiera się na dacie faktycznego dostępu wskazanej na fakturze, nie na dacie jej wystawienia, a klienci czasem przedłużają z opóźnieniem po utracie dostępu albo ze świadomą, zaplanowaną przerwą), ale obaj **już przedłużyli** (widoczne w danych: kolejna faktura z przychodem od lipca 2026). Pierwotna definicja (tylko M+1) wykazywałaby ich błędnie jako wciąż niedziałających klientów, mimo że stan na dzień ostatniego importu pokazuje już przedłużenie. Naprawione w `buildExpiringContractsReport.ts` — test kwalifikujący sprawdza teraz, czy istnieje **jakikolwiek** późniejszy miesiąc z przychodem (z serii, bez zmian względem V.42), nie tylko M+1. Reguła horyzontu (13.d) bez zmian. **Świadomie odłożone na przyszłość (użytkownik):** rozbicie zestawienia 13 na dwa odrębne — (1) „klienci, których pakiet kończy się w miesiącu M" (obejmuje też tych, którzy już przedłużyli, z opóźnieniem lub bez) oraz (2) obecne, ważniejsze „klienci, którzy wygasli w M i dotychczas nie przedłużyli" — dodane jako pytanie otwarte P7 w `PLAN.md`.
+
+44. **[ZMIENIONE, koryguje III.B.14.a/b i 15.a/b] Zestawienia 14/15 kwalifikują klienta po fladze (najwcześniejszy miesiąc z przychodem w danym wersie F/G), nie po agregacie „brak przychodu w M−1, jest w M i M+1".** Ustalone z użytkownikiem przy implementacji (zadanie 2.5), po rozpoznaniu tej samej klasy problemu, co w zestawieniu 13 (V.43) — flaga F/G jest już zwalidowana przy imporcie względem całej widocznej historii klienta, więc ponowne wyliczanie "nowości"/"początku przedłużenia" z lokalnego okna trzech miesięcy jest niepotrzebne i podatne na te same błędy brzegowe. Wartość i faktury pochodzą z M+1 (potwierdzone z użytkownikiem, symetrycznie do V.43/13.b.v, które z tego samego powodu używa M−1). Reguła horyzontu zmieniona zgodnie z tym — wymaga tylko M+1, nie M−1 (szczegóły w III.B.14.c/d). **Zweryfikowane na danych rzeczywistych (`local-data/Sprzedaz.xlsx`, decyzja V.41):** klient z cykliczną comiesięczną fakturą (MiŚOT S.A.) poprawnie pojawia się w zestawieniu 15 każdego miesiąca — początkowo wyglądało to na błąd/szum, ale użytkownik potwierdził, że to zgodne ze stanem faktycznym: taki klient faktycznie decyduje o przedłużeniu co miesiąc.
 
 ---
 

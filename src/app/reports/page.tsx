@@ -4,11 +4,14 @@ import { buildMonthlySummary } from "@/lib/reports/buildMonthlySummary";
 import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthlyRevenueReport";
 import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContractsReport";
 import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
+import { buildPackageStartReport } from "@/lib/reports/buildPackageStartReport";
+import { isWithinPackageStartHorizon } from "@/lib/reports/packageStartHorizon";
 import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
 import { formatGroszeAsDecimal } from "@/lib/import/formatGroszeAsDecimal";
 import { MonthSelect } from "./MonthSelect";
 import { ArchiveButton } from "./ArchiveButton";
 import { ClientReportTable } from "./ClientReportTable";
+import { ReportSection } from "./ReportSection";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +63,14 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
   const expiringEligible = isWithinExpiringHorizon(months, selectedMonth);
   const expiringReport = expiringEligible
     ? buildExpiringContractsReport(itemMonthFacts, selectedMonth).sort((a, b) => b.revenueGrosze - a.revenueGrosze)
+    : [];
+
+  const startEligible = isWithinPackageStartHorizon(months, selectedMonth);
+  const newClientsReport = startEligible
+    ? buildPackageStartReport(itemMonthFacts, "F", selectedMonth).sort((a, b) => b.revenueGrosze - a.revenueGrosze)
+    : [];
+  const renewalStartsReport = startEligible
+    ? buildPackageStartReport(itemMonthFacts, "G", selectedMonth).sort((a, b) => b.revenueGrosze - a.revenueGrosze)
     : [];
 
   return (
@@ -163,26 +174,47 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
         />
       </div>
 
-      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">
-          13. Klienci, których umowy wygasły w tym miesiącu i dotychczas nie przedłużyli{" "}
-          {expiringEligible ? `(${expiringReport.length})` : ""}
-        </h2>
-        {expiringEligible ? (
-          <ClientReportTable
-            rows={expiringReport}
-            clientNames={clientNames}
-            revenueLabel="Wartość do utraty (miesiąc poprzedni)"
-            emptyMessage="Brak klientów, których umowy wygasają w tym miesiącu."
-          />
-        ) : (
-          <p className="text-sm text-gray-500">
-            {months.length >= 3
-              ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca poprzedniego i następnego w danych (dostępne dla ${months[1]} – ${months[months.length - 2]}).`
-              : "Niedostępne — zestawienie wymaga co najmniej 3 miesięcy danych."}
-          </p>
-        )}
-      </div>
+      <ReportSection
+        title="13. Klienci, których umowy wygasły w tym miesiącu i dotychczas nie przedłużyli"
+        eligible={expiringEligible}
+        rows={expiringReport}
+        clientNames={clientNames}
+        revenueLabel="Wartość do utraty (miesiąc poprzedni)"
+        emptyMessage="Brak klientów, których umowy wygasły w tym miesiącu i dotychczas nie przedłużyli."
+        unavailableMessage={
+          months.length >= 3
+            ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca poprzedniego i następnego w danych (dostępne dla ${months[1]} – ${months[months.length - 2]}).`
+            : "Niedostępne — zestawienie wymaga co najmniej 3 miesięcy danych."
+        }
+      />
+
+      <ReportSection
+        title="14. Nowi klienci, których pakiet zaczyna się w tym miesiącu"
+        eligible={startEligible}
+        rows={newClientsReport}
+        clientNames={clientNames}
+        revenueLabel="Wartość (pierwszy pełny miesiąc)"
+        emptyMessage="Brak nowych klientów zaczynających w tym miesiącu."
+        unavailableMessage={
+          months.length >= 2
+            ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca następnego w danych (dostępne do ${months[months.length - 2]}).`
+            : "Niedostępne — zestawienie wymaga co najmniej 2 miesięcy danych."
+        }
+      />
+
+      <ReportSection
+        title="15. Klienci przedłużający, których przedłużenie zaczyna się w tym miesiącu"
+        eligible={startEligible}
+        rows={renewalStartsReport}
+        clientNames={clientNames}
+        revenueLabel="Wartość (pierwszy pełny miesiąc)"
+        emptyMessage="Brak przedłużeń zaczynających się w tym miesiącu."
+        unavailableMessage={
+          months.length >= 2
+            ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca następnego w danych (dostępne do ${months[months.length - 2]}).`
+            : "Niedostępne — zestawienie wymaga co najmniej 2 miesięcy danych."
+        }
+      />
     </div>
   );
 }

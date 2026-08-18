@@ -8,6 +8,8 @@ import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthl
 import type { ClientRevenueReportRow } from "@/lib/reports/buildClientMonthlyRevenueReport";
 import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContractsReport";
 import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
+import { buildPackageStartReport } from "@/lib/reports/buildPackageStartReport";
+import { isWithinPackageStartHorizon } from "@/lib/reports/packageStartHorizon";
 import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
 import { formatGroszeAsDecimal } from "@/lib/import/formatGroszeAsDecimal";
 
@@ -84,6 +86,18 @@ export async function archiveReport(month: string): Promise<{ archivedAt: string
       (a, b) => b.revenueGrosze - a.revenueGrosze
     );
     payload.expiringClients = toClientPayload(expiringReport, clientNames);
+  }
+
+  if (isWithinPackageStartHorizon(availableMonths, month)) {
+    const newClientsReport = buildPackageStartReport(itemMonthFacts, "F", month).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    payload.newClients = toClientPayload(newClientsReport, clientNames);
+
+    const renewalStartsReport = buildPackageStartReport(itemMonthFacts, "G", month).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    payload.renewalStarts = toClientPayload(renewalStartsReport, clientNames);
   }
 
   const { data: inserted, error: insertError } = await supabase

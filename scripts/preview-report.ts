@@ -33,6 +33,8 @@ import type { ItemMonthFact } from "../src/lib/reports/buildClientMonthlyRevenue
 import { countBanksAndSkoks } from "../src/lib/reports/countBanksAndSkoks.ts";
 import { buildExpiringContractsReport } from "../src/lib/reports/buildExpiringContractsReport.ts";
 import { isWithinExpiringHorizon } from "../src/lib/reports/expiringReportHorizon.ts";
+import { buildPackageStartReport } from "../src/lib/reports/buildPackageStartReport.ts";
+import { isWithinPackageStartHorizon } from "../src/lib/reports/packageStartHorizon.ts";
 
 interface MonthlyFlaggedFact {
   month: string;
@@ -190,7 +192,7 @@ async function main() {
     : await factsFromDatabase();
   const source = filePath ? `plik ${filePath} (baza nie była dotykana)` : "baza Supabase";
 
-  console.log(`Zestawienia 1-13, 16 (podgląd) - miesiąc ${targetMonth} - źródło: ${source}\n`);
+  console.log(`Zestawienia 1-16 (podgląd) - miesiąc ${targetMonth} - źródło: ${source}\n`);
 
   const paying = aggregateMonthlyRevenuePerClient(
     itemMonthFacts.map((f) => ({ nip: f.nip, month: f.month, amountGrosze: f.monthlyAmountGrosze }))
@@ -242,6 +244,34 @@ async function main() {
       const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
       console.log(
         `${row.nip}\t${name}\twartość do utraty (mies. poprzedni): ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
+      );
+    }
+  }
+
+  if (!isWithinPackageStartHorizon(availableMonths, targetMonth)) {
+    console.log(
+      `\n14-15. (niedostępne dla ${targetMonth} - reguła horyzontu 14.c/15.c wymaga widocznego miesiąca następnego w danych; dostępne do ${availableMonths[availableMonths.length - 2]})`
+    );
+  } else {
+    const newClients = buildPackageStartReport(itemMonthFacts, "F", targetMonth).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    console.log(`\n14. Nowi klienci, których pakiet zaczyna się w ${targetMonth} (${newClients.length}):`);
+    for (const row of newClients) {
+      const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
+      console.log(
+        `${row.nip}\t${name}\twartość (pierwszy pełny miesiąc): ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
+      );
+    }
+
+    const renewalStarts = buildPackageStartReport(itemMonthFacts, "G", targetMonth).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    console.log(`\n15. Przedłużenia zaczynające się w ${targetMonth} (${renewalStarts.length}):`);
+    for (const row of renewalStarts) {
+      const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
+      console.log(
+        `${row.nip}\t${name}\twartość (pierwszy pełny miesiąc): ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
       );
     }
   }

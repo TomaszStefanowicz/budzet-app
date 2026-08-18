@@ -64,3 +64,10 @@ export function buildExpiringSheetRows(
 ): SheetCell[][] {
   return buildClientTableSheetRows(expiringReport, clientNames, "Wartość do utraty (miesiąc poprzedni)");
 }
+
+export function buildPackageStartSheetRows(
+  startReport: ClientRevenueReportRow[],
+  clientNames: Map<string, string>
+): SheetCell[][] {
+  return buildClientTableSheetRows(startReport, clientNames, "Wartość (pierwszy pełny miesiąc)");
+}
