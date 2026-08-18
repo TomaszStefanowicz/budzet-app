@@ -19,3 +19,20 @@ export async function updateClientType(nip: string, type: string) {
 
   revalidatePath("/clients");
 }
+
+export async function updateClientTypeBulk(nips: string[], type: string) {
+  if (!ALLOWED_TYPES.includes(type as ClientType)) {
+    throw new Error(`Nieznany typ klienta: ${type}`);
+  }
+  if (nips.length === 0) {
+    throw new Error("Nie zaznaczono żadnego klienta.");
+  }
+
+  const supabase = createServiceRoleSupabaseClient();
+  const { error } = await supabase.from("clients").update({ type }).in("nip", nips);
+  if (error) {
+    throw new Error(`Błąd zapisu typu klienta: ${error.message}`);
+  }
+
+  revalidatePath("/clients");
+}

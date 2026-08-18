@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/service-role";
-import { ClientTypeSelect } from "./ClientTypeSelect";
+import { ClientsTable } from "./ClientsTable";
 
 export const dynamic = "force-dynamic";
 
@@ -35,38 +35,7 @@ export default async function ClientsPage() {
 
         {!error && clients?.length === 0 && <p className="text-sm text-gray-500">Brak klientów.</p>}
 
-        {!error && clients && clients.length > 0 && (
-          <div className="max-h-[70vh] overflow-y-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="sticky top-0 z-10 border-b border-gray-200 bg-white text-gray-500">
-                  <th className="py-2 font-medium">NIP</th>
-                  <th className="py-2 font-medium">Nazwa</th>
-                  <th className="py-2 font-medium">Typ</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clients.map((c) => (
-                  <tr
-                    key={c.nip}
-                    className={`border-b border-gray-100 ${c.type === "nieokreślony" ? "bg-amber-50" : "even:bg-gray-50"}`}
-                  >
-                    <td className="py-2">{c.nip}</td>
-                    <td className="py-2">
-                      {c.name}
-                      {c.previous_name && (
-                        <span className="ml-1 text-xs text-gray-400">(dawniej: {c.previous_name})</span>
-                      )}
-                    </td>
-                    <td className="py-2">
-                      <ClientTypeSelect nip={c.nip} type={c.type} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        {!error && clients && clients.length > 0 && <ClientsTable clients={clients} />}
       </div>
     </div>
   );
