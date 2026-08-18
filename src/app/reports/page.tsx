@@ -36,8 +36,8 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
             ← Powrót do importu
           </Link>
         </div>
-        <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <h1 className="mb-1 text-lg font-semibold text-gray-900">Zestawienia</h1>
+        <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+          <h1 className="mb-1 text-xl font-bold text-gray-900">Zestawienia</h1>
           <p className="text-sm text-gray-500">Brak danych — zaimportuj plik sprzedażowy.</p>
         </div>
       </div>
@@ -91,79 +91,79 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
         </div>
       </div>
 
-      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h1 className="mb-4 text-lg font-semibold text-gray-900">Zestawienia 1–11, 16</h1>
+      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        <h1 className="mb-4 text-xl font-bold text-gray-900">Zestawienia 1–11, 16</h1>
 
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-gray-500">
               <th className="py-2 font-medium">Zestawienie</th>
-              <th className="py-2 font-medium">Wartość</th>
+              <th className="py-2 text-right font-medium">Wartość</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">1. Liczba klientów, którzy zapłacili</td>
-              <td className="py-2">{summary.payingClientsCount}</td>
+              <td className="py-2 text-right">{summary.payingClientsCount}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">2. Wartość sprzedaży — razem</td>
-              <td className="py-2">{formatZl(summary.salesBreakdown.total)}</td>
+              <td className="py-2 text-right">{formatZl(summary.salesBreakdown.total)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">3. Wartość sprzedaży — klienci nowi (F)</td>
-              <td className="py-2">{formatZl(summary.salesBreakdown.F)}</td>
+              <td className="py-2 text-right">{formatZl(summary.salesBreakdown.F)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">4. Wartość sprzedaży — klienci przedłużający (G)</td>
-              <td className="py-2">{formatZl(summary.salesBreakdown.G)}</td>
+              <td className="py-2 text-right">{formatZl(summary.salesBreakdown.G)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">5. Wartość sprzedaży — dokupienia (H)</td>
-              <td className="py-2">{formatZl(summary.salesBreakdown.H)}</td>
+              <td className="py-2 text-right">{formatZl(summary.salesBreakdown.H)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">6. Wartość sprzedaży — zakupy incydentalne (I)</td>
-              <td className="py-2">{formatZl(summary.salesBreakdown.I)}</td>
+              <td className="py-2 text-right">{formatZl(summary.salesBreakdown.I)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2 text-gray-400">— w tym korekty</td>
-              <td className="py-2 text-gray-400">{formatZl(summary.salesBreakdown.corrections)}</td>
+              <td className="py-2 text-right text-gray-400">{formatZl(summary.salesBreakdown.corrections)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">7. Wartość przychodów — razem</td>
-              <td className="py-2">{formatZl(summary.revenueBreakdown.total)}</td>
+              <td className="py-2 text-right">{formatZl(summary.revenueBreakdown.total)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">8. Wartość przychodów — klienci nowi (F)</td>
-              <td className="py-2">{formatZl(summary.revenueBreakdown.F)}</td>
+              <td className="py-2 text-right">{formatZl(summary.revenueBreakdown.F)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">9. Wartość przychodów — klienci przedłużający (G)</td>
-              <td className="py-2">{formatZl(summary.revenueBreakdown.G)}</td>
+              <td className="py-2 text-right">{formatZl(summary.revenueBreakdown.G)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">10. Wartość przychodów — dokupienia (H)</td>
-              <td className="py-2">{formatZl(summary.revenueBreakdown.H)}</td>
+              <td className="py-2 text-right">{formatZl(summary.revenueBreakdown.H)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2">11. Wartość przychodów — zakupy incydentalne (I)</td>
-              <td className="py-2">{formatZl(summary.revenueBreakdown.I)}</td>
+              <td className="py-2 text-right">{formatZl(summary.revenueBreakdown.I)}</td>
             </tr>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-gray-100 even:bg-gray-50">
               <td className="py-2 text-gray-400">— w tym korekty</td>
-              <td className="py-2 text-gray-400">{formatZl(summary.revenueBreakdown.corrections)}</td>
+              <td className="py-2 text-right text-gray-400">{formatZl(summary.revenueBreakdown.corrections)}</td>
             </tr>
-            <tr>
+            <tr className="even:bg-gray-50">
               <td className="py-2">16. Liczba banków / SKOK-ów wśród płacących</td>
-              <td className="py-2">{banksAndSkoks}</td>
+              <td className="py-2 text-right">{banksAndSkoks}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">
+      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-xl font-bold text-gray-900">
           12. Klienci z przychodem w miesiącu ({clientReport.length})
         </h2>
         <ClientReportTable

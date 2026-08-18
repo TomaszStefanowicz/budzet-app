@@ -61,11 +61,17 @@ export function UploadForm() {
   }
 
   return (
-    <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h1 className="mb-4 text-lg font-semibold text-gray-900">Import pliku sprzedażowego</h1>
+    <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <h1 className="mb-4 text-xl font-bold text-gray-900">Import pliku sprzedażowego</h1>
 
       <form onSubmit={handleSubmit} className="flex items-center gap-3">
-        <input type="file" name="file" accept=".xlsx" required className="text-sm" />
+        <input
+          type="file"
+          name="file"
+          accept=".xlsx"
+          required
+          className="text-sm text-gray-500 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-200"
+        />
         <button
           type="submit"
           disabled={loading}
@@ -75,7 +81,9 @@ export function UploadForm() {
         </button>
       </form>
 
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      {error && (
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+      )}
 
       {validationErrors.length > 0 && (
         <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-3">

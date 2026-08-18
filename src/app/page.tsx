@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/service-role";
 import { signOut } from "./actions";
 import { UploadForm } from "./UploadForm";
+import { StatusBadge } from "./components/StatusBadge";
 
 function formatMonthRange(from: string | null, to: string | null): string {
   if (!from || !to) return "—";
@@ -25,14 +26,12 @@ export default async function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 bg-gray-50 px-4 py-12">
       <div className="flex w-full max-w-3xl items-center justify-between">
-        <p className="text-gray-700">
-          Zalogowano jako <span className="font-medium">{user?.email}</span>
-        </p>
+        <p className="text-xs text-gray-400">{user?.email}</p>
         <div className="flex items-center gap-4">
-          <Link href="/reports" className="text-sm text-gray-600 hover:underline">
+          <Link href="/reports" className="text-sm font-medium text-gray-700 hover:underline">
             Zestawienia
           </Link>
-          <Link href="/clients" className="text-sm text-gray-600 hover:underline">
+          <Link href="/clients" className="text-sm font-medium text-gray-700 hover:underline">
             Słownik klientów
           </Link>
           <form action={signOut}>
@@ -48,8 +47,8 @@ export default async function Home() {
 
       <UploadForm />
 
-      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h1 className="mb-4 text-lg font-semibold text-gray-900">Historia importów</h1>
+      <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        <h1 className="mb-4 text-xl font-bold text-gray-900">Historia importów</h1>
 
         {error && (
           <p className="text-sm text-red-600">
@@ -62,32 +61,34 @@ export default async function Home() {
         )}
 
         {!error && imports && imports.length > 0 && (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-gray-500">
-                <th className="py-2 font-medium">Data importu</th>
-                <th className="py-2 font-medium">Plik</th>
-                <th className="py-2 font-medium">Liczba wersów</th>
-                <th className="py-2 font-medium">Zakres miesięcy</th>
-                <th className="py-2 font-medium">Wynik</th>
-              </tr>
-            </thead>
-            <tbody>
-              {imports.map((row) => (
-                <tr key={row.id} className="border-b border-gray-100">
-                  <td className="py-2">
-                    {new Date(row.imported_at).toLocaleString("pl-PL")}
-                  </td>
-                  <td className="py-2">{row.file_name}</td>
-                  <td className="py-2">{row.row_count}</td>
-                  <td className="py-2">{formatMonthRange(row.detected_month_from, row.detected_month_to)}</td>
-                  <td className="py-2">
-                    {row.validation_status === "sukces" ? "sukces" : "błąd"}
-                  </td>
+          <div className="max-h-[60vh] overflow-y-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="sticky top-0 z-10 border-b border-gray-200 bg-white text-gray-500">
+                  <th className="py-2 font-medium">Data importu</th>
+                  <th className="py-2 font-medium">Plik</th>
+                  <th className="py-2 text-right font-medium">Liczba wersów</th>
+                  <th className="py-2 font-medium">Zakres miesięcy</th>
+                  <th className="py-2 font-medium">Wynik</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {imports.map((row) => (
+                  <tr key={row.id} className="border-b border-gray-100 even:bg-gray-50">
+                    <td className="py-2">
+                      {new Date(row.imported_at).toLocaleString("pl-PL")}
+                    </td>
+                    <td className="py-2">{row.file_name}</td>
+                    <td className="py-2 text-right">{row.row_count}</td>
+                    <td className="py-2">{formatMonthRange(row.detected_month_from, row.detected_month_to)}</td>
+                    <td className="py-2">
+                      <StatusBadge status={row.validation_status === "sukces" ? "sukces" : "błąd"} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
