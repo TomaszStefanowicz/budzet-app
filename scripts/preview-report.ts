@@ -237,7 +237,7 @@ async function main() {
     const expiring = buildExpiringContractsReport(itemMonthFacts, targetMonth).sort(
       (a, b) => b.revenueGrosze - a.revenueGrosze
     );
-    console.log(`\n13. Klienci, których umowy wygasają w ${targetMonth} (${expiring.length}):`);
+    console.log(`\n13. Klienci, których umowy wygasły w ${targetMonth} i dotychczas nie przedłużyli (${expiring.length}):`);
     for (const row of expiring) {
       const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
       console.log(

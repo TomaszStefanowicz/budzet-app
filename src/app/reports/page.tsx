@@ -165,7 +165,8 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
 
       <div className="w-full max-w-3xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-lg font-semibold text-gray-900">
-          13. Klienci, których umowy wygasają w tym miesiącu {expiringEligible ? `(${expiringReport.length})` : ""}
+          13. Klienci, których umowy wygasły w tym miesiącu i dotychczas nie przedłużyli{" "}
+          {expiringEligible ? `(${expiringReport.length})` : ""}
         </h2>
         {expiringEligible ? (
           <ClientReportTable
