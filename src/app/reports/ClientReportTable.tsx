@@ -109,9 +109,12 @@ export function ClientReportTable({
         <span className="text-sm text-gray-500">
           Wyszukano: {filtered.length} / {rows.length}
         </span>
-        <span className="text-sm text-gray-500">
-          Suma: {formatZl(totals.revenueGrosze)} / {formatZl(totals.invoiceTotalGrosze)}
-        </span>
+        <div className="ml-auto flex items-center text-sm text-gray-500">
+          <span className="mr-2">Suma:</span>
+          <span className="w-36 px-2 text-right">{formatZl(totals.revenueGrosze)}</span>
+          <span className="w-36 px-2 text-right">{formatZl(totals.invoiceTotalGrosze)}</span>
+          <span className="w-40" />
+        </div>
       </div>
 
       {filtered.length === 0 ? (
