@@ -18,20 +18,34 @@ const FLAG_COLUMNS: { letter: "F" | "G" | "H" | "I"; label: string }[] = [
   { letter: "I", label: "I" },
 ];
 
-// Stałe szerokości KAŻDEJ kolumny (table-layout: fixed) - bez tego przeglądarka
-// przelicza szerokości kolumn ponownie przy scrollu w połączeniu z `position:
-// sticky`, co dawało rozjazd między pierwszym renderem a stanem po przewinięciu.
-const LP_WIDTH = "w-14";
+// Stałe szerokości KAŻDEJ kolumny w pikselach. `table-layout: fixed` samo w
+// sobie nie wystarcza - tabela bez własnej szerokości i tak rozciąga się do
+// szerokości kontenera, rozdzielając nadmiar proporcjonalnie na kolumny
+// (potwierdzone w DevTools). Dlatego liczymy dokładną sumę i ustawiamy ją
+// wprost jako `width` na <table> (style inline, bo wartość zależy od liczby
+// miesięcy) - żadnej niejednoznaczności co do faktycznej szerokości tabeli.
+const LP_WIDTH_PX = 56;
+const NAZWA_WIDTH_PX = 360;
+const NIP_WIDTH_PX = 112;
+const DOKUMENT_WIDTH_PX = 144;
+const NETTO_WIDTH_PX = 128;
+const FLAG_WIDTH_PX = 32;
+const MONTH_WIDTH_PX = 112;
+
+// Uwaga: te napisy MUSZĄ być dosłownymi literałami w kodzie źródłowym (nie
+// budowane przez interpolację zmiennej), inaczej skaner Tailwinda ich nie
+// znajdzie i nie wygeneruje odpowiedniej reguły CSS.
+const LP_WIDTH = "w-[56px]";
 const NAZWA_WIDTH = "w-[360px]";
-const NIP_WIDTH = "w-28";
-const DOKUMENT_WIDTH = "w-36";
-const NETTO_WIDTH = "w-32";
-const FLAG_WIDTH = "w-8";
-const MONTH_WIDTH = "w-28";
+const NIP_WIDTH = "w-[112px]";
+const DOKUMENT_WIDTH = "w-[144px]";
+const NETTO_WIDTH = "w-[128px]";
+const FLAG_WIDTH = "w-[32px]";
+const MONTH_WIDTH = "w-[112px]";
 
 // Zablokowane (sticky) kolumny Lp/Nazwa/NIP - przesunięcie `left` to suma
 // szerokości poprzednich zablokowanych kolumn.
-const NAZWA_LEFT = "left-14"; // = szerokość kolumny Lp (3.5rem/56px)
+const NAZWA_LEFT = "left-[56px]"; // = szerokość kolumny Lp
 const NIP_LEFT = "left-[416px]"; // = Lp (56px) + Nazwa (360px)
 
 export default async function DataPage() {
@@ -55,6 +69,15 @@ export default async function DataPage() {
   const rows = buildSourceDataRows(items, clientNames, months);
   const totals = sumSourceDataColumns(rows, months.length);
 
+  const totalTableWidthPx =
+    LP_WIDTH_PX +
+    NAZWA_WIDTH_PX +
+    NIP_WIDTH_PX +
+    DOKUMENT_WIDTH_PX +
+    NETTO_WIDTH_PX +
+    FLAG_WIDTH_PX * FLAG_COLUMNS.length +
+    MONTH_WIDTH_PX * months.length;
+
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 bg-gray-50 px-4 py-12">
       <div className="w-full max-w-6xl">
@@ -68,7 +91,7 @@ export default async function DataPage() {
         </p>
 
         <div className="max-h-[70vh] overflow-auto">
-          <table className="w-max table-fixed text-left text-xs">
+          <table className="table-fixed text-left text-xs" style={{ width: `${totalTableWidthPx}px` }}>
             <thead>
               <tr className="sticky top-0 z-10 border-b border-gray-200 bg-white text-gray-500">
                 <th
@@ -98,7 +121,10 @@ export default async function DataPage() {
                 ))}
               </tr>
               <tr className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500">
-                <td className="sticky left-0 z-10 overflow-hidden whitespace-nowrap border-r border-gray-300 bg-gray-50 px-2 py-1" colSpan={3}>
+                <td
+                  className="sticky left-0 z-10 overflow-hidden text-right whitespace-nowrap border-r border-gray-300 bg-gray-50 px-2 py-1"
+                  colSpan={3}
+                >
                   Suma:
                 </td>
                 <td className={`${DOKUMENT_WIDTH} overflow-hidden whitespace-nowrap px-2 py-1`} />
