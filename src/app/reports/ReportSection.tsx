@@ -20,9 +20,7 @@ export function ReportSection({
 }) {
   return (
     <div className="w-full max-w-6xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-4 text-xl font-bold text-gray-900">
-        {title} {eligible ? `(${rows.length})` : ""}
-      </h2>
+      <h2 className="mb-4 text-xl font-bold text-gray-900">{title}</h2>
       {eligible ? (
         <ClientReportTable
           rows={rows}

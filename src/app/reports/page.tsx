@@ -156,9 +156,7 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
       </div>
 
       <div className="w-full max-w-6xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-xl font-bold text-gray-900">
-          12. Klienci z przychodem w miesiącu ({clientReport.length})
-        </h2>
+        <h2 className="mb-4 text-xl font-bold text-gray-900">12. Klienci z przychodem w miesiącu</h2>
         <ClientReportTable
           rows={clientReport}
           clientNames={clientNames}
