@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { signOut } from "../actions";
 
-type ActivePage = "import" | "data" | "reports" | "clients";
+type ActivePage = "import" | "data" | "reports" | "archive" | "clients";
 
 const LINKS: { href: string; label: string; key: ActivePage }[] = [
   { href: "/", label: "Import", key: "import" },
   { href: "/data", label: "Dane", key: "data" },
   { href: "/reports", label: "Zestawienia", key: "reports" },
+  { href: "/archive", label: "Archiwum", key: "archive" },
   { href: "/clients", label: "Słownik klientów", key: "clients" },
 ];
 
