@@ -6,6 +6,7 @@ import {
   buildClientsSheetRows,
   buildExpiringSheetRows,
   buildPackageStartSheetRows,
+  buildBanksAndSkoksSheetRows,
 } from "@/app/reports/export";
 import { buildMonthlySummary } from "@/lib/reports/buildMonthlySummary";
 import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthlyRevenueReport";
@@ -13,7 +14,7 @@ import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContrac
 import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
 import { buildPackageStartReport } from "@/lib/reports/buildPackageStartReport";
 import { isWithinPackageStartHorizon } from "@/lib/reports/packageStartHorizon";
-import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
+import { filterBanksAndSkoks } from "@/lib/reports/filterBanksAndSkoks";
 
 export async function GET(request: Request) {
   const month = new URL(request.url).searchParams.get("month");
@@ -31,13 +32,13 @@ export async function GET(request: Request) {
   const clientReport = buildClientMonthlyRevenueReport(itemMonthFacts, month).sort(
     (a, b) => b.revenueGrosze - a.revenueGrosze
   );
-  const banksAndSkoks = countBanksAndSkoks(clientReport.map((row) => row.nip), clientTypes);
+  const banksAndSkoksReport = filterBanksAndSkoks(clientReport, clientTypes);
 
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(
     workbook,
-    XLSX.utils.aoa_to_sheet(buildSummarySheetRows(summary, banksAndSkoks)),
-    "Zestawienia 1-11, 16"
+    XLSX.utils.aoa_to_sheet(buildSummarySheetRows(summary)),
+    "Zestawienia 1-11"
   );
   XLSX.utils.book_append_sheet(
     workbook,
@@ -75,6 +76,12 @@ export async function GET(request: Request) {
       "Zestawienie 15"
     );
   }
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    XLSX.utils.aoa_to_sheet(buildBanksAndSkoksSheetRows(banksAndSkoksReport, clientNames)),
+    "Zestawienie 16"
+  );
 
   const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }) as Buffer;
 

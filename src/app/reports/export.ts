@@ -15,7 +15,7 @@ function zl(grosze: number): number {
   return Number(formatGroszeAsDecimal(grosze));
 }
 
-export function buildSummarySheetRows(summary: MonthlySummary, banksAndSkoks: number): SheetCell[][] {
+export function buildSummarySheetRows(summary: MonthlySummary): SheetCell[][] {
   return [
     ["Zestawienie", "Wartość"],
     ["1. Liczba klientów, którzy zapłacili", summary.payingClientsCount],
@@ -31,7 +31,6 @@ export function buildSummarySheetRows(summary: MonthlySummary, banksAndSkoks: nu
     ["10. Wartość przychodów — dokupienia (H)", zl(summary.revenueBreakdown.H)],
     ["11. Wartość przychodów — zakupy incydentalne (I)", zl(summary.revenueBreakdown.I)],
     ["— w tym korekty (przychody)", zl(summary.revenueBreakdown.corrections)],
-    ["16. Liczba banków / SKOK-ów wśród płacących", banksAndSkoks],
   ];
 }
 
@@ -70,4 +69,11 @@ export function buildPackageStartSheetRows(
   clientNames: Map<string, string>
 ): SheetCell[][] {
   return buildClientTableSheetRows(startReport, clientNames, "Wartość (pierwszy pełny miesiąc)");
+}
+
+export function buildBanksAndSkoksSheetRows(
+  banksAndSkoksReport: ClientRevenueReportRow[],
+  clientNames: Map<string, string>
+): SheetCell[][] {
+  return buildClientTableSheetRows(banksAndSkoksReport, clientNames, "Przychód miesiąca");
 }

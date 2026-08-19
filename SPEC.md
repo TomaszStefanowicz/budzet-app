@@ -213,7 +213,7 @@ c) Reguła horyzontu jak w pkt 14c (wymaga wyłącznie M+1).
 
 d) Kwalifikacja i wartość jak w pkt 14d, z flagą G zamiast F.
 
-#### 16. [ZMIENIONE, patrz d) i V.45] Lista banków i SKOK-ów będących klientami
+#### 16. [ZMIENIONE, patrz d) i V.45/V.46] Lista banków i SKOK-ów będących klientami
 
 a) **Definicja:** lista klientów generujących przychody w danym miesiącu (wg pkt 12), którzy w słowniku klientów mają atrybut typu „bank" lub „SKOK", z tymi samymi kolumnami co pkt 12 (NIP, nazwa, przychód miesiąca, suma faktur, dokumenty).
 
@@ -221,7 +221,7 @@ b) **Sposób uzyskania:** atrybut typu klienta przypisywany jest jednorazowo w s
 
 c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzymuje w słowniku typ domyślny „nieokreślony". Aplikacja pokazuje listę klientów z typem nieokreślonym po każdym imporcie, żeby uzupełnienie słownika nie zostało przeoczone.
 
-d) **[ZMIENIONE, decyzja V.45]** Na ekranie `/reports` zestawienie 16 prezentowane jest jako pełna tabela (analogicznie do pkt 12–15), nie jako sama liczba. Archiwum (`report_archive`, zadanie 4.1) i eksport `.xlsx` zachowują dotychczasową liczbę (`banksAndSkoks`) bez zmian — zmiana dotyczy wyłącznie ekranu.
+d) **[ZMIENIONE, decyzje V.45/V.46]** Zestawienie 16 prezentowane jest jako pełna tabela (analogicznie do pkt 12–15) na ekranie `/reports`, w archiwum (`report_archive.payload.banksAndSkoksClients`, zadanie 4.1) i w eksporcie `.xlsx` (osobny arkusz „Zestawienie 16"). Wcześniejsza liczba (`banksAndSkoks`/`countBanksAndSkoks`) usunięta ze wszystkich trzech miejsc.
 
 ---
 
@@ -336,7 +336,9 @@ d) **[ZMIENIONE, decyzja V.45]** Na ekranie `/reports` zestawienie 16 prezentowa
 
 44. **[ZMIENIONE, koryguje III.B.14.a/b i 15.a/b] Zestawienia 14/15 kwalifikują klienta po fladze (najwcześniejszy miesiąc z przychodem w danym wersie F/G), nie po agregacie „brak przychodu w M−1, jest w M i M+1".** Ustalone z użytkownikiem przy implementacji (zadanie 2.5), po rozpoznaniu tej samej klasy problemu, co w zestawieniu 13 (V.43) — flaga F/G jest już zwalidowana przy imporcie względem całej widocznej historii klienta, więc ponowne wyliczanie "nowości"/"początku przedłużenia" z lokalnego okna trzech miesięcy jest niepotrzebne i podatne na te same błędy brzegowe. Wartość i faktury pochodzą z M+1 (potwierdzone z użytkownikiem, symetrycznie do V.43/13.b.v, które z tego samego powodu używa M−1). Reguła horyzontu zmieniona zgodnie z tym — wymaga tylko M+1, nie M−1 (szczegóły w III.B.14.c/d). **Zweryfikowane na danych rzeczywistych (`local-data/Sprzedaz.xlsx`, decyzja V.41):** klient z cykliczną comiesięczną fakturą (MiŚOT S.A.) poprawnie pojawia się w zestawieniu 15 każdego miesiąca — początkowo wyglądało to na błąd/szum, ale użytkownik potwierdził, że to zgodne ze stanem faktycznym: taki klient faktycznie decyduje o przedłużeniu co miesiąc.
 
-45. **[ZMIENIONE, koryguje III.B.16.a] Zestawienie 16 na ekranie `/reports` to pełna tabela klientów (bank/SKOK), nie sama liczba.** Użytkownik poprosił o ujednolicenie prezentacji z zestawieniami 12–15, żeby od razu widzieć, którzy konkretnie klienci to banki/SKOK-i i jaki mają przychód, zamiast tylko liczby. Nowa czysta funkcja `filterBanksAndSkoks` (`lib/reports/`) zwraca listę `ClientRevenueReportRow` zamiast liczby — ta sama reguła kwalifikacji (typ „bank"/„SKOK" ze słownika) co dotychczasowe `countBanksAndSkoks`, które **zostaje bez zmian** i nadal zasila liczbę w archiwum (`report_archive`, zadanie 4.1) i eksporcie `.xlsx` — świadomie odłożone jako osobna decyzja, bo zmiana dotyczyła wyłącznie ekranu, nie tych dwóch miejsc.
+45. **[ZMIENIONE, koryguje III.B.16.a] Zestawienie 16 na ekranie `/reports` to pełna tabela klientów (bank/SKOK), nie sama liczba.** Użytkownik poprosił o ujednolicenie prezentacji z zestawieniami 12–15, żeby od razu widzieć, którzy konkretnie klienci to banki/SKOK-i i jaki mają przychód, zamiast tylko liczby. Nowa czysta funkcja `filterBanksAndSkoks` (`lib/reports/`) zwraca listę `ClientRevenueReportRow` zamiast liczby — ta sama reguła kwalifikacji (typ „bank"/„SKOK" ze słownika) co dotychczasowe `countBanksAndSkoks`. Pierwotnie ograniczone wyłącznie do ekranu (archiwum/eksport miały zostać bez zmian) — **rozszerzone decyzją V.46** po weryfikacji przez użytkownika.
+
+46. **[UZUPEŁNIENIE, rozszerza V.45] Zmiana zestawienia 16 na listę objęła też archiwum i eksport `.xlsx`, nie tylko ekran.** Użytkownik zweryfikował poprawność listy z V.45 na kilku miesiącach względem budżetu i poprosił o rozszerzenie, skoro nie niesie to ryzyka. `countBanksAndSkoks` usunięte (nieużywane po zmianie, razem z testem) na rzecz `filterBanksAndSkoks` wszędzie: `report_archive.payload` ma teraz `banksAndSkoksClients` (pełna lista, ten sam kształt co `clients`/`expiringClients`/itd.) zamiast `summary.banksAndSkoks` (liczba); eksport `.xlsx` ma osobny arkusz „Zestawienie 16" (analogiczny do „Zestawienie 12"), a wiersz „16." usunięty z arkusza „Zestawienia 1-11" (zmieniona nazwa z „Zestawienia 1-11, 16"). Niskie ryzyko: `report_archive.payload` to jsonb bez własnego typowania odczytywanego wyłącznie przez panel podglądu Supabase (SPEC.md IV.1), więc zmiana kształtu nowych migawek nie psuje nic wstecznie; eksport to plik generowany na żądanie, bez przechowywanego stanu.
 
 ---
 

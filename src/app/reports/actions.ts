@@ -10,7 +10,7 @@ import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContrac
 import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
 import { buildPackageStartReport } from "@/lib/reports/buildPackageStartReport";
 import { isWithinPackageStartHorizon } from "@/lib/reports/packageStartHorizon";
-import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
+import { filterBanksAndSkoks } from "@/lib/reports/filterBanksAndSkoks";
 import { formatGroszeAsDecimal } from "@/lib/import/formatGroszeAsDecimal";
 
 function zl(grosze: number): number {
@@ -69,16 +69,16 @@ export async function archiveReport(month: string): Promise<{ archivedAt: string
   const clientReport = buildClientMonthlyRevenueReport(itemMonthFacts, month).sort(
     (a, b) => b.revenueGrosze - a.revenueGrosze
   );
-  const banksAndSkoks = countBanksAndSkoks(clientReport.map((row) => row.nip), clientTypes);
+  const banksAndSkoksReport = filterBanksAndSkoks(clientReport, clientTypes);
 
   const payload: Record<string, unknown> = {
     summary: {
       payingClientsCount: summary.payingClientsCount,
       salesBreakdownZl: breakdownToZl(summary.salesBreakdown),
       revenueBreakdownZl: breakdownToZl(summary.revenueBreakdown),
-      banksAndSkoks,
     },
     clients: toClientPayload(clientReport, clientNames),
+    banksAndSkoksClients: toClientPayload(banksAndSkoksReport, clientNames),
   };
 
   if (isWithinExpiringHorizon(availableMonths, month)) {

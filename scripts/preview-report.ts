@@ -30,7 +30,7 @@ import { aggregateMonthlyRevenuePerClient } from "../src/lib/reports/aggregateMo
 import { sumByFlag } from "../src/lib/reports/sumByFlag.ts";
 import { buildClientMonthlyRevenueReport } from "../src/lib/reports/buildClientMonthlyRevenueReport.ts";
 import type { ItemMonthFact } from "../src/lib/reports/buildClientMonthlyRevenueReport.ts";
-import { countBanksAndSkoks } from "../src/lib/reports/countBanksAndSkoks.ts";
+import { filterBanksAndSkoks } from "../src/lib/reports/filterBanksAndSkoks.ts";
 import { buildExpiringContractsReport } from "../src/lib/reports/buildExpiringContractsReport.ts";
 import { isWithinExpiringHorizon } from "../src/lib/reports/expiringReportHorizon.ts";
 import { buildPackageStartReport } from "../src/lib/reports/buildPackageStartReport.ts";
@@ -223,11 +223,14 @@ async function main() {
       "\n16. (niedostępne w trybie --file - typ klienta jest wyłącznie w słowniku aplikacji, nie w pliku źródłowym)"
     );
   } else {
-    const banksAndSkoks = countBanksAndSkoks(
-      report.map((row) => row.nip),
-      clientTypes
-    );
-    console.log(`\n16. Liczba banków/SKOK-ów wśród płacących klientów: ${banksAndSkoks}`);
+    const banksAndSkoks = filterBanksAndSkoks(report, clientTypes);
+    console.log(`\n16. Banki i SKOK-i wśród płacących klientów (${banksAndSkoks.length}):`);
+    for (const row of banksAndSkoks) {
+      const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
+      console.log(
+        `${row.nip}\t${name}\tprzychód miesiąca: ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
+      );
+    }
   }
 
   const availableMonths = Array.from(new Set(itemMonthFacts.map((f) => f.month))).sort();
