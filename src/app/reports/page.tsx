@@ -6,18 +6,14 @@ import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
 import { buildPackageStartReport } from "@/lib/reports/buildPackageStartReport";
 import { isWithinPackageStartHorizon } from "@/lib/reports/packageStartHorizon";
 import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
-import { formatGroszeAsDecimal } from "@/lib/import/formatGroszeAsDecimal";
 import { MonthSelect } from "./MonthSelect";
 import { ArchiveButton } from "./ArchiveButton";
 import { ClientReportTable } from "./ClientReportTable";
 import { ReportSection } from "./ReportSection";
 import { Nav } from "../components/Nav";
+import { formatZl } from "./formatZl";
 
 export const dynamic = "force-dynamic";
-
-function formatZl(grosze: number): string {
-  return `${formatGroszeAsDecimal(grosze)} zł`;
-}
 
 function currentMonthDate(): string {
   const now = new Date();

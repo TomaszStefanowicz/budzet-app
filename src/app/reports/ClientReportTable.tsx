@@ -1,12 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatGroszeAsDecimal } from "@/lib/import/formatGroszeAsDecimal";
+import { formatZl } from "./formatZl";
 import type { ClientRevenueReportRow } from "@/lib/reports/buildClientMonthlyRevenueReport";
-
-function formatZl(grosze: number): string {
-  return `${formatGroszeAsDecimal(grosze)} zł`;
-}
 
 type SortColumn = "nip" | "name" | "revenue" | "invoiceTotal";
 type SortDirection = "asc" | "desc";
