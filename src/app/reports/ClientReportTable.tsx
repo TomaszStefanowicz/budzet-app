@@ -7,13 +7,22 @@ import type { ClientRevenueReportRow } from "@/lib/reports/buildClientMonthlyRev
 type SortColumn = "nip" | "name" | "revenue" | "invoiceTotal";
 type SortDirection = "asc" | "desc";
 
+export function documentsCountLabel(count: number): string {
+  const lastDigit = count % 10;
+  const lastTwoDigits = count % 100;
+  const useNominativePlural = lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14);
+  return `${count} ${useNominativePlural ? "dokumenty" : "dokumentów"}`;
+}
+
 function DocumentsCell({ documentNumbers }: { documentNumbers: string[] }) {
   if (documentNumbers.length === 0) return <span className="text-gray-400">—</span>;
   if (documentNumbers.length === 1) return <>{documentNumbers[0]}</>;
 
   return (
     <details>
-      <summary className="cursor-pointer text-gray-700 select-none">{documentNumbers.length} dokumentów</summary>
+      <summary className="cursor-pointer text-gray-700 select-none">
+        {documentsCountLabel(documentNumbers.length)}
+      </summary>
       <div className="mt-1 text-gray-600">{documentNumbers.join(", ")}</div>
     </details>
   );
