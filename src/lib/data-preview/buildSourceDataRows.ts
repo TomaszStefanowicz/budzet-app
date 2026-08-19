@@ -43,3 +43,21 @@ export function buildSourceDataRows(
       monthlyAmountsGrosze: months.map((month) => item.monthlyAmountsGrosze.get(month) ?? 0),
     }));
 }
+
+export interface SourceDataColumnTotals {
+  netAmountGrosze: number;
+  monthlyTotalsGrosze: number[];
+}
+
+/** Sumy kolumn z przychodami (wartość netto + każdy miesiąc) do wiersza sum nad tabelą "Dane". */
+export function sumSourceDataColumns(rows: SourceDataRow[], monthsCount: number): SourceDataColumnTotals {
+  const monthlyTotalsGrosze = new Array(monthsCount).fill(0);
+  let netAmountGrosze = 0;
+  for (const row of rows) {
+    netAmountGrosze += row.netAmountGrosze;
+    row.monthlyAmountsGrosze.forEach((amount, index) => {
+      monthlyTotalsGrosze[index] += amount;
+    });
+  }
+  return { netAmountGrosze, monthlyTotalsGrosze };
+}
