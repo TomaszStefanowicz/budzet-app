@@ -97,7 +97,10 @@ export function ClientReportTable({
           <table className="w-full table-fixed text-left text-sm">
             <thead>
               <tr className="sticky top-0 z-10 border-b border-gray-200 bg-white text-gray-500">
-                <th className="cursor-pointer py-2 font-medium select-none" onClick={() => toggleSort("nip")}>
+                <th
+                  className="w-32 cursor-pointer px-2 py-2 font-medium select-none"
+                  onClick={() => toggleSort("nip")}
+                >
                   NIP{sortIndicator("nip")}
                 </th>
                 <th className="cursor-pointer py-2 font-medium select-none" onClick={() => toggleSort("name")}>
@@ -116,17 +119,17 @@ export function ClientReportTable({
                 >
                   Suma faktur{sortIndicator("invoiceTotal")}
                 </th>
-                <th className="py-2 text-center font-medium">Dokumenty</th>
+                <th className="w-40 px-2 py-2 text-center font-medium">Dokumenty</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((row) => (
                 <tr key={row.nip} className="border-b border-gray-100 align-top even:bg-gray-50">
-                  <td className="py-2">{row.nip}</td>
+                  <td className="px-2 py-2">{row.nip}</td>
                   <td className="py-2">{clientNames[row.nip] ?? "(nieznana nazwa)"}</td>
                   <td className="px-2 py-2 text-right">{formatZl(row.revenueGrosze)}</td>
                   <td className="px-2 py-2 text-right">{formatZl(row.invoiceTotalGrosze)}</td>
-                  <td className="py-2">
+                  <td className="px-2 py-2">
                     <DocumentsCell documentNumbers={row.documentNumbers} />
                   </td>
                 </tr>
