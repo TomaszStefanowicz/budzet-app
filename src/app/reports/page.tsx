@@ -5,7 +5,7 @@ import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContrac
 import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
 import { buildPackageStartReport } from "@/lib/reports/buildPackageStartReport";
 import { isWithinPackageStartHorizon } from "@/lib/reports/packageStartHorizon";
-import { countBanksAndSkoks } from "@/lib/reports/countBanksAndSkoks";
+import { filterBanksAndSkoks } from "@/lib/reports/filterBanksAndSkoks";
 import { MonthSelect } from "./MonthSelect";
 import { ArchiveButton } from "./ArchiveButton";
 import { ClientReportTable } from "./ClientReportTable";
@@ -53,7 +53,7 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
   const clientReport = buildClientMonthlyRevenueReport(itemMonthFacts, selectedMonth).sort(
     (a, b) => b.revenueGrosze - a.revenueGrosze
   );
-  const banksAndSkoks = countBanksAndSkoks(clientReport.map((row) => row.nip), clientTypes);
+  const banksAndSkoksReport = filterBanksAndSkoks(clientReport, clientTypes);
 
   const expiringEligible = isWithinExpiringHorizon(months, selectedMonth);
   const expiringReport = expiringEligible
@@ -85,7 +85,7 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
       </div>
 
       <div className="w-full max-w-6xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-        <h1 className="mb-4 text-xl font-bold text-gray-900">Zestawienia 1–11, 16</h1>
+        <h1 className="mb-4 text-xl font-bold text-gray-900">Zestawienia 1–11</h1>
 
         <table className="w-full table-fixed text-left text-sm">
           <thead>
@@ -143,13 +143,9 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
               <td className="py-2">11. Wartość przychodów — zakupy incydentalne (I)</td>
               <td className="py-2 px-2 text-right">{formatZl(summary.revenueBreakdown.I)}</td>
             </tr>
-            <tr className="border-b border-gray-100 even:bg-gray-50">
+            <tr className="even:bg-gray-50">
               <td className="py-2 text-gray-400">— w tym korekty</td>
               <td className="py-2 px-2 text-right text-gray-400">{formatZl(summary.revenueBreakdown.corrections)}</td>
-            </tr>
-            <tr className="even:bg-gray-50">
-              <td className="py-2">16. Liczba banków / SKOK-ów wśród płacących</td>
-              <td className="py-2 px-2 text-right">{banksAndSkoks}</td>
             </tr>
           </tbody>
         </table>
@@ -206,6 +202,16 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
             : "Niedostępne — zestawienie wymaga co najmniej 2 miesięcy danych."
         }
       />
+
+      <div className="w-full max-w-6xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-xl font-bold text-gray-900">16. Banki i SKOK-i wśród płacących klientów</h2>
+        <ClientReportTable
+          rows={banksAndSkoksReport}
+          clientNames={clientNames}
+          revenueLabel="Przychód miesiąca"
+          emptyMessage="Brak banków/SKOK-ów z przychodem w tym miesiącu."
+        />
+      </div>
     </div>
   );
 }

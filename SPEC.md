@@ -213,13 +213,15 @@ c) Reguła horyzontu jak w pkt 14c (wymaga wyłącznie M+1).
 
 d) Kwalifikacja i wartość jak w pkt 14d, z flagą G zamiast F.
 
-#### 16. Liczba banków będących klientami
+#### 16. [ZMIENIONE, patrz d) i V.45] Lista banków i SKOK-ów będących klientami
 
-a) **Definicja:** liczba klientów generujących przychody w danym miesiącu (wg pkt 12), którzy w słowniku klientów mają atrybut typu „bank" lub „SKOK".
+a) **Definicja:** lista klientów generujących przychody w danym miesiącu (wg pkt 12), którzy w słowniku klientów mają atrybut typu „bank" lub „SKOK", z tymi samymi kolumnami co pkt 12 (NIP, nazwa, przychód miesiąca, suma faktur, dokumenty).
 
 b) **Sposób uzyskania:** atrybut typu klienta przypisywany jest jednorazowo w słowniku klientów aplikacji (z możliwością edycji), a nie wykrywany z nazwy.
 
 c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzymuje w słowniku typ domyślny „nieokreślony". Aplikacja pokazuje listę klientów z typem nieokreślonym po każdym imporcie, żeby uzupełnienie słownika nie zostało przeoczone.
+
+d) **[ZMIENIONE, decyzja V.45]** Na ekranie `/reports` zestawienie 16 prezentowane jest jako pełna tabela (analogicznie do pkt 12–15), nie jako sama liczba. Archiwum (`report_archive`, zadanie 4.1) i eksport `.xlsx` zachowują dotychczasową liczbę (`banksAndSkoks`) bez zmian — zmiana dotyczy wyłącznie ekranu.
 
 ---
 
@@ -333,6 +335,8 @@ c) **[UZUPEŁNIENIE]** Klient pojawiający się w imporcie po raz pierwszy otrzy
 43. **[ZMIENIONE, koryguje III.B.13.a i b] Zestawienie 13 sprawdza brak przychodu w KAŻDYM miesiącu po M, nie tylko w M+1 — bo wygasła umowa i przedłużenie z opóźnieniem to różne rzeczy.** Ujawnione backtestem na `local-data/Sprzedaz.xlsx` dla maja 2026 (dwa przykłady: Salumanus Sp. z o.o. i Wschodni Bank Spółdzielczy w Chełmie) — obaj klienci mieli realną, jednomiesięczną przerwę w przychodzie w czerwcu 2026 (nie błąd danych/formuły — rozliczenie międzyokresowe opiera się na dacie faktycznego dostępu wskazanej na fakturze, nie na dacie jej wystawienia, a klienci czasem przedłużają z opóźnieniem po utracie dostępu albo ze świadomą, zaplanowaną przerwą), ale obaj **już przedłużyli** (widoczne w danych: kolejna faktura z przychodem od lipca 2026). Pierwotna definicja (tylko M+1) wykazywałaby ich błędnie jako wciąż niedziałających klientów, mimo że stan na dzień ostatniego importu pokazuje już przedłużenie. Naprawione w `buildExpiringContractsReport.ts` — test kwalifikujący sprawdza teraz, czy istnieje **jakikolwiek** późniejszy miesiąc z przychodem (z serii, bez zmian względem V.42), nie tylko M+1. Reguła horyzontu (13.d) bez zmian. **Świadomie odłożone na przyszłość (użytkownik):** rozbicie zestawienia 13 na dwa odrębne — (1) „klienci, których pakiet kończy się w miesiącu M" (obejmuje też tych, którzy już przedłużyli, z opóźnieniem lub bez) oraz (2) obecne, ważniejsze „klienci, którzy wygasli w M i dotychczas nie przedłużyli" — dodane jako pytanie otwarte P7 w `PLAN.md`.
 
 44. **[ZMIENIONE, koryguje III.B.14.a/b i 15.a/b] Zestawienia 14/15 kwalifikują klienta po fladze (najwcześniejszy miesiąc z przychodem w danym wersie F/G), nie po agregacie „brak przychodu w M−1, jest w M i M+1".** Ustalone z użytkownikiem przy implementacji (zadanie 2.5), po rozpoznaniu tej samej klasy problemu, co w zestawieniu 13 (V.43) — flaga F/G jest już zwalidowana przy imporcie względem całej widocznej historii klienta, więc ponowne wyliczanie "nowości"/"początku przedłużenia" z lokalnego okna trzech miesięcy jest niepotrzebne i podatne na te same błędy brzegowe. Wartość i faktury pochodzą z M+1 (potwierdzone z użytkownikiem, symetrycznie do V.43/13.b.v, które z tego samego powodu używa M−1). Reguła horyzontu zmieniona zgodnie z tym — wymaga tylko M+1, nie M−1 (szczegóły w III.B.14.c/d). **Zweryfikowane na danych rzeczywistych (`local-data/Sprzedaz.xlsx`, decyzja V.41):** klient z cykliczną comiesięczną fakturą (MiŚOT S.A.) poprawnie pojawia się w zestawieniu 15 każdego miesiąca — początkowo wyglądało to na błąd/szum, ale użytkownik potwierdził, że to zgodne ze stanem faktycznym: taki klient faktycznie decyduje o przedłużeniu co miesiąc.
+
+45. **[ZMIENIONE, koryguje III.B.16.a] Zestawienie 16 na ekranie `/reports` to pełna tabela klientów (bank/SKOK), nie sama liczba.** Użytkownik poprosił o ujednolicenie prezentacji z zestawieniami 12–15, żeby od razu widzieć, którzy konkretnie klienci to banki/SKOK-i i jaki mają przychód, zamiast tylko liczby. Nowa czysta funkcja `filterBanksAndSkoks` (`lib/reports/`) zwraca listę `ClientRevenueReportRow` zamiast liczby — ta sama reguła kwalifikacji (typ „bank"/„SKOK" ze słownika) co dotychczasowe `countBanksAndSkoks`, które **zostaje bez zmian** i nadal zasila liczbę w archiwum (`report_archive`, zadanie 4.1) i eksporcie `.xlsx` — świadomie odłożone jako osobna decyzja, bo zmiana dotyczyła wyłącznie ekranu, nie tych dwóch miejsc.
 
 ---
 
