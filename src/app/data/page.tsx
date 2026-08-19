@@ -68,7 +68,7 @@ export default async function DataPage() {
         </p>
 
         <div className="max-h-[70vh] overflow-auto">
-          <table className="table-fixed text-left text-xs">
+          <table className="w-max table-fixed text-left text-xs">
             <thead>
               <tr className="sticky top-0 z-10 border-b border-gray-200 bg-white text-gray-500">
                 <th
