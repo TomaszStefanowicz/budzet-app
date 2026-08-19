@@ -94,7 +94,7 @@ export function ClientReportTable({
         <p className="text-sm text-gray-500">Brak wyników wyszukiwania.</p>
       ) : (
         <div className="max-h-[70vh] overflow-y-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full table-fixed text-left text-sm">
             <thead>
               <tr className="sticky top-0 z-10 border-b border-gray-200 bg-white text-gray-500">
                 <th className="cursor-pointer py-2 font-medium select-none" onClick={() => toggleSort("nip")}>
@@ -104,19 +104,19 @@ export function ClientReportTable({
                   Nazwa{sortIndicator("name")}
                 </th>
                 <th
-                  className="cursor-pointer py-2 text-right font-medium select-none"
+                  className="w-36 cursor-pointer px-2 py-2 text-center font-medium select-none"
                   onClick={() => toggleSort("revenue")}
                 >
                   {revenueLabel}
                   {sortIndicator("revenue")}
                 </th>
                 <th
-                  className="cursor-pointer py-2 text-right font-medium select-none"
+                  className="w-36 cursor-pointer px-2 py-2 text-center font-medium select-none"
                   onClick={() => toggleSort("invoiceTotal")}
                 >
                   Suma faktur{sortIndicator("invoiceTotal")}
                 </th>
-                <th className="py-2 font-medium">Dokumenty</th>
+                <th className="py-2 text-center font-medium">Dokumenty</th>
               </tr>
             </thead>
             <tbody>
@@ -124,8 +124,8 @@ export function ClientReportTable({
                 <tr key={row.nip} className="border-b border-gray-100 align-top even:bg-gray-50">
                   <td className="py-2">{row.nip}</td>
                   <td className="py-2">{clientNames[row.nip] ?? "(nieznana nazwa)"}</td>
-                  <td className="py-2 text-right">{formatZl(row.revenueGrosze)}</td>
-                  <td className="py-2 text-right">{formatZl(row.invoiceTotalGrosze)}</td>
+                  <td className="px-2 py-2 text-right">{formatZl(row.revenueGrosze)}</td>
+                  <td className="px-2 py-2 text-right">{formatZl(row.invoiceTotalGrosze)}</td>
                   <td className="py-2">
                     <DocumentsCell documentNumbers={row.documentNumbers} />
                   </td>
