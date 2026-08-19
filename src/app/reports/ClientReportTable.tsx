@@ -109,6 +109,9 @@ export function ClientReportTable({
         <span className="text-sm text-gray-500">
           Wyszukano: {filtered.length} / {rows.length}
         </span>
+        <span className="text-sm text-gray-500">
+          Suma: {formatZl(totals.revenueGrosze)} / {formatZl(totals.invoiceTotalGrosze)}
+        </span>
       </div>
 
       {filtered.length === 0 ? (
@@ -141,12 +144,6 @@ export function ClientReportTable({
                   Suma faktur{sortIndicator("invoiceTotal")}
                 </th>
                 <th className="w-40 px-2 py-2 text-center font-medium">Dokumenty</th>
-              </tr>
-              <tr className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500">
-                <td className="px-2 py-1" colSpan={2}></td>
-                <td className="px-2 py-1 text-right font-medium">Suma: {formatZl(totals.revenueGrosze)}</td>
-                <td className="px-2 py-1 text-right font-medium">Suma: {formatZl(totals.invoiceTotalGrosze)}</td>
-                <td className="px-2 py-1"></td>
               </tr>
             </thead>
             <tbody>
