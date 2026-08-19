@@ -11,6 +11,18 @@ function formatZl(grosze: number): string {
 type SortColumn = "nip" | "name" | "revenue" | "invoiceTotal";
 type SortDirection = "asc" | "desc";
 
+function DocumentsCell({ documentNumbers }: { documentNumbers: string[] }) {
+  if (documentNumbers.length === 0) return <span className="text-gray-400">—</span>;
+  if (documentNumbers.length === 1) return <>{documentNumbers[0]}</>;
+
+  return (
+    <details>
+      <summary className="cursor-pointer text-gray-700 select-none">{documentNumbers.length} dokumentów</summary>
+      <div className="mt-1 text-gray-600">{documentNumbers.join(", ")}</div>
+    </details>
+  );
+}
+
 export function ClientReportTable({
   rows,
   clientNames,
@@ -118,7 +130,9 @@ export function ClientReportTable({
                   <td className="py-2">{clientNames[row.nip] ?? "(nieznana nazwa)"}</td>
                   <td className="py-2 text-right">{formatZl(row.revenueGrosze)}</td>
                   <td className="py-2 text-right">{formatZl(row.invoiceTotalGrosze)}</td>
-                  <td className="py-2">{row.documentNumbers.join(", ")}</td>
+                  <td className="py-2">
+                    <DocumentsCell documentNumbers={row.documentNumbers} />
+                  </td>
                 </tr>
               ))}
             </tbody>
