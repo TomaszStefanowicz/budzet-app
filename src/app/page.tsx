@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createServiceRoleSupabaseClient } from "@/lib/supabase/service-role";
-import { signOut } from "./actions";
 import { UploadForm } from "./UploadForm";
 import { StatusBadge } from "./components/StatusBadge";
+import { Nav } from "./components/Nav";
 
 function formatMonthRange(from: string | null, to: string | null): string {
   if (!from || !to) return "—";
@@ -25,24 +24,8 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 bg-gray-50 px-4 py-12">
-      <div className="flex w-full max-w-3xl items-center justify-between">
-        <p className="text-xs text-gray-400">{user?.email}</p>
-        <div className="flex items-center gap-4">
-          <Link href="/reports" className="text-sm font-medium text-gray-700 hover:underline">
-            Zestawienia
-          </Link>
-          <Link href="/clients" className="text-sm font-medium text-gray-700 hover:underline">
-            Słownik klientów
-          </Link>
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-            >
-              Wyloguj
-            </button>
-          </form>
-        </div>
+      <div className="w-full max-w-3xl">
+        <Nav active="import" email={user?.email} />
       </div>
 
       <UploadForm />

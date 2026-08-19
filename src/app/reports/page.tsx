@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { loadAvailableMonths, loadReportFacts } from "./data";
 import { buildMonthlySummary } from "@/lib/reports/buildMonthlySummary";
 import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthlyRevenueReport";
@@ -12,6 +11,7 @@ import { MonthSelect } from "./MonthSelect";
 import { ArchiveButton } from "./ArchiveButton";
 import { ClientReportTable } from "./ClientReportTable";
 import { ReportSection } from "./ReportSection";
+import { Nav } from "../components/Nav";
 
 export const dynamic = "force-dynamic";
 
@@ -32,9 +32,7 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
     return (
       <div className="flex min-h-screen flex-col items-center gap-8 bg-gray-50 px-4 py-12">
         <div className="w-full max-w-6xl">
-          <Link href="/" className="text-sm text-gray-600 hover:underline">
-            ← Powrót do importu
-          </Link>
+          <Nav active="reports" />
         </div>
         <div className="w-full max-w-6xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
           <h1 className="mb-1 text-xl font-bold text-gray-900">Zestawienia</h1>
@@ -76,11 +74,9 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 bg-gray-50 px-4 py-12">
-      <div className="flex w-full max-w-6xl items-center justify-between">
-        <Link href="/" className="text-sm text-gray-600 hover:underline">
-          ← Powrót do importu
-        </Link>
-        <div className="flex items-center gap-3">
+      <div className="flex w-full max-w-6xl flex-col gap-3">
+        <Nav active="reports" />
+        <div className="flex items-center justify-end gap-3">
           <a
             href={`/api/reports/export?month=${selectedMonth}`}
             className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100"
