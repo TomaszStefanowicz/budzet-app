@@ -66,6 +66,18 @@ export function ClientReportTable({
     return sorted;
   }, [rows, clientNames, search, sortColumn, sortDirection]);
 
+  const totals = useMemo(
+    () =>
+      filtered.reduce(
+        (acc, row) => ({
+          revenueGrosze: acc.revenueGrosze + row.revenueGrosze,
+          invoiceTotalGrosze: acc.invoiceTotalGrosze + row.invoiceTotalGrosze,
+        }),
+        { revenueGrosze: 0, invoiceTotalGrosze: 0 }
+      ),
+    [filtered]
+  );
+
   function toggleSort(column: SortColumn) {
     if (sortColumn !== column) {
       setSortColumn(column);
@@ -95,7 +107,7 @@ export function ClientReportTable({
           className="w-64 rounded-md border border-gray-300 px-3 py-1.5 text-sm"
         />
         <span className="text-sm text-gray-500">
-          {filtered.length} / {rows.length}
+          Wyszukano: {filtered.length} / {rows.length}
         </span>
       </div>
 
@@ -129,6 +141,12 @@ export function ClientReportTable({
                   Suma faktur{sortIndicator("invoiceTotal")}
                 </th>
                 <th className="w-40 px-2 py-2 text-center font-medium">Dokumenty</th>
+              </tr>
+              <tr className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500">
+                <td className="px-2 py-1" colSpan={2}></td>
+                <td className="px-2 py-1 text-right font-medium">Suma: {formatZl(totals.revenueGrosze)}</td>
+                <td className="px-2 py-1 text-right font-medium">Suma: {formatZl(totals.invoiceTotalGrosze)}</td>
+                <td className="px-2 py-1"></td>
               </tr>
             </thead>
             <tbody>
