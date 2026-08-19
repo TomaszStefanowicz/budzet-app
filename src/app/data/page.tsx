@@ -18,6 +18,14 @@ const FLAG_COLUMNS: { letter: "F" | "G" | "H" | "I"; label: string }[] = [
   { letter: "I", label: "I" },
 ];
 
+// Zablokowane (sticky) kolumny Lp/Nazwa/NIP - szerokości muszą być stałe,
+// żeby dało się wyliczyć skumulowane przesunięcie `left` kolejnej kolumny.
+const LP_WIDTH = "w-14";
+const NAZWA_LEFT = "left-14"; // = szerokość kolumny Lp (3.5rem/56px)
+const NIP_LEFT = "left-[416px]"; // = Lp (56px) + Nazwa (360px)
+const NAZWA_WIDTH = "w-[360px]";
+const NIP_WIDTH = "w-28";
+
 export default async function DataPage() {
   const months = await loadAvailableMonths();
 
@@ -55,9 +63,19 @@ export default async function DataPage() {
           <table className="text-left text-xs">
             <thead>
               <tr className="sticky top-0 z-10 border-b border-gray-200 bg-white text-gray-500">
-                <th className="whitespace-nowrap px-2 py-2 text-right font-medium">Lp</th>
-                <th className="whitespace-nowrap px-2 py-2 font-medium">Nazwa klienta</th>
-                <th className="whitespace-nowrap px-2 py-2 font-medium">NIP</th>
+                <th className={`sticky left-0 z-20 ${LP_WIDTH} whitespace-nowrap bg-white px-2 py-2 text-right font-medium`}>
+                  Lp
+                </th>
+                <th
+                  className={`sticky ${NAZWA_LEFT} z-20 ${NAZWA_WIDTH} whitespace-nowrap bg-white px-2 py-2 font-medium`}
+                >
+                  Nazwa klienta
+                </th>
+                <th
+                  className={`sticky ${NIP_LEFT} z-20 ${NIP_WIDTH} whitespace-nowrap border-r border-gray-300 bg-white px-2 py-2 font-medium`}
+                >
+                  NIP
+                </th>
                 <th className="whitespace-nowrap px-2 py-2 font-medium">Numer dokumentu</th>
                 <th className="whitespace-nowrap px-2 py-2 text-right font-medium">Wartość netto</th>
                 {FLAG_COLUMNS.map(({ letter, label }) => (
@@ -72,9 +90,13 @@ export default async function DataPage() {
                 ))}
               </tr>
               <tr className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500">
-                <td className="whitespace-nowrap px-2 py-1" colSpan={4}>
+                <td
+                  className="sticky left-0 z-10 whitespace-nowrap border-r border-gray-300 bg-gray-50 px-2 py-1"
+                  colSpan={3}
+                >
                   Suma:
                 </td>
+                <td className="whitespace-nowrap px-2 py-1" />
                 <td className="whitespace-nowrap px-2 py-1 text-right font-medium">{formatZl(totals.netAmountGrosze)}</td>
                 {FLAG_COLUMNS.map(({ letter }) => (
                   <td key={letter} className="whitespace-nowrap px-2 py-1" />
@@ -89,11 +111,20 @@ export default async function DataPage() {
             <tbody>
               {rows.map((row) => (
                 <tr key={`${row.lp}-${row.nip}`} className="border-b border-gray-100 even:bg-gray-50">
-                  <td className="whitespace-nowrap px-2 py-1 text-right">{row.lp}</td>
-                  <td className="max-w-[180px] truncate px-2 py-1" title={row.clientName}>
+                  <td className={`sticky left-0 z-10 ${LP_WIDTH} whitespace-nowrap bg-white px-2 py-1 text-right`}>
+                    {row.lp}
+                  </td>
+                  <td
+                    className={`sticky ${NAZWA_LEFT} z-10 ${NAZWA_WIDTH} truncate bg-white px-2 py-1`}
+                    title={row.clientName}
+                  >
                     {row.clientName}
                   </td>
-                  <td className="whitespace-nowrap px-2 py-1">{row.nip}</td>
+                  <td
+                    className={`sticky ${NIP_LEFT} z-10 ${NIP_WIDTH} whitespace-nowrap border-r border-gray-300 bg-white px-2 py-1`}
+                  >
+                    {row.nip}
+                  </td>
                   <td className="whitespace-nowrap px-2 py-1">{row.documentNumber}</td>
                   <td className="whitespace-nowrap px-2 py-1 text-right">{formatZl(row.netAmountGrosze)}</td>
                   {FLAG_COLUMNS.map(({ letter }) => (
