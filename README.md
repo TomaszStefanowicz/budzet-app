@@ -12,7 +12,7 @@ Projekt zrealizowany jako praca zaliczeniowa kursu vibe codingu (termin: 14 dni,
 
 ## Dane logowania (instancja demo)
 
-_Do uzupełnienia — konto dla organizatorów kursu jeszcze nie zostało założone (zadanie 4.3 w `PLAN.md`, odłożone). Rejestracja samodzielna jest wyłączona — konto zakłada właściciel projektu w panelu Supabase Auth._
+Login i hasło do konta demo przekazane są osobno, w prezentacji dla organizatorów kursu — nie w tym publicznym repozytorium (ujawnienie danych logowania do produkcyjnej instancji w publicznym README naruszałoby zasady bezpieczeństwa). Rejestracja samodzielna jest wyłączona — konto zakłada właściciel projektu w panelu Supabase Auth.
 
 ## Dane demo
 
