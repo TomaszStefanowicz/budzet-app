@@ -342,6 +342,12 @@ d) **[ZMIENIONE, decyzje V.45/V.46]** Zestawienie 16 prezentowane jest jako peł
 
 46. **[UZUPEŁNIENIE, rozszerza V.45] Zmiana zestawienia 16 na listę objęła też archiwum i eksport `.xlsx`, nie tylko ekran.** Użytkownik zweryfikował poprawność listy z V.45 na kilku miesiącach względem budżetu i poprosił o rozszerzenie, skoro nie niesie to ryzyka. `countBanksAndSkoks` usunięte (nieużywane po zmianie, razem z testem) na rzecz `filterBanksAndSkoks` wszędzie: `report_archive.payload` ma teraz `banksAndSkoksClients` (pełna lista, ten sam kształt co `clients`/`expiringClients`/itd.) zamiast `summary.banksAndSkoks` (liczba); eksport `.xlsx` ma osobny arkusz „Zestawienie 16" (analogiczny do „Zestawienie 12"), a wiersz „16." usunięty z arkusza „Zestawienia 1-11" (zmieniona nazwa z „Zestawienia 1-11, 16"). Niskie ryzyko: `report_archive.payload` to jsonb bez własnego typowania odczytywanego wyłącznie przez panel podglądu Supabase (SPEC.md IV.1), więc zmiana kształtu nowych migawek nie psuje nic wstecznie; eksport to plik generowany na żądanie, bez przechowywanego stanu.
 
+48. **[UZUPEŁNIENIE 2026-08-27] Rozdział środowisk (VI.3) wykonywany przed zgodą na publikację prezentacji; demo trwale publiczne z dedykowanym kontem demo o pełnych uprawnieniach.** Organizator kursu publikuje na swojej stronie finalną prezentację projektu wraz z linkiem do aplikacji i danymi logowania — demo zmienia status z „tymczasowe, dla oceniających" na „trwale publiczne". Dane logowania szykowane do prezentacji (rozstrzygnięcie zadania 4.3) to konto właściciela na jedynej, współdzielonej instancji — przy trwałej publikacji zastępuje je dedykowane konto demo w Supabase Auth instancji demo (publiczne hasło nie może być hasłem właściciela). Konto demo świadomie zachowuje pełne uprawnienia, w tym import — demo ma pokazywać pełną funkcjonalność. Zaakceptowana konsekwencja: każdy z opublikowanym hasłem może zastąpić dane demo własnym importem, edytować słownik i zapisywać migawki; dane demo są syntetyczne i deterministycznie odtwarzalne (stały seed), procedura odtwarzania: reimport `test-data/dane-syntetyczne-clean.xlsx` + odtworzenie rozkładu typów słownika jak w zadaniu 4.2a (50 bank / 25 SKOK / 325 inny / 100 nieokreślony). Rozważono i odrzucono konto demo bez prawa importu — wymagałoby ról użytkowników, świadomie pozostających poza zakresem (VI.10). Wszystkie trzy incydenty z okresu kursu (16.08, 19.08, utrata konta) miały wspólne źródło operacyjne — brak separacji środowisk; rozdział musi nastąpić przed publikacją, przed pierwszym commitem zmieniającym UI i przed załadowaniem danych rzeczywistych.
+
+49. **[UZUPEŁNIENIE 2026-08-27] Ping podtrzymujący zamiast planu płatnego Supabase (VI.7).** Plan darmowy pauzuje projekt po ~7 dniach niskiej aktywności; przy trwale opublikowanym linku martwe demo psuje wizerunek projektu, a produkcja także podlega pauzowaniu (np. urlop). Rozwiązanie: codzienny ping (cron) wykonujący trywialne zapytanie do bazy każdej z dwóch instancji chmurowych — każde zapytanie API resetuje licznik bezczynności. Świadomie przyjęte zastrzeżenia planu darmowego: (1) zerowa retencja backupów — dla demo bez znaczenia (dane syntetyczne), dla produkcji baza jest odtwarzalna z pliku źródłowego (import całościowy, decyzja 2), ale kategoryzacja słownika klientów i migawki `report_archive` istnieją wyłącznie w aplikacji → po każdej dużej kategoryzacji wykonywany jest zrzut tabeli `clients` do pliku lokalnego; (2) moment przejścia produkcji na plan płatny: gdy z aplikacji zaczną korzystać sprzedawcy/obsługa klienta — wtedy niedostępność i brak backupów przestają być akceptowalne.
+
+50. **[UZUPEŁNIENIE 2026-08-27] Środowisko dev: lokalny Supabase przez CLI (`supabase start`, Docker), nie instancja chmurowa.** `.env.local` wskazuje na localhost — `npm run dev` nie dotyka żadnej bazy chmurowej, migracje są testowane lokalnie zanim trafią na produkcję (wzmacnia zasadę „schemat wyłącznie z migracji w repo"). Rozważono i odrzucono: (a) współdzielenie bazy demo — pierwsza migracja przetestowana lokalnie zmieniłaby schemat bazy, na której działa zamrożony kod gałęzi `demo`, wysypując publiczne demo; (b) trzeci projekt chmurowy — plan darmowy ogranicza do 2 aktywnych projektów, wyczerpanych przez demo i produkcję. Do czasu wykonania konfiguracji lokalnej obowiązuje zakaz uruchamiania importu i migracji z lokalnego dev przeciwko instancjom chmurowym.
+
 ---
 
 ## VI. [UZUPEŁNIENIE] Wymagania niefunkcjonalne
@@ -358,18 +364,33 @@ d) **[ZMIENIONE, decyzje V.45/V.46]** Zestawienie 16 prezentowane jest jako peł
 - Supabase Auth, logowanie email + hasło.
 - Rejestracja samodzielna wyłączona — konta zakłada właściciel projektu.
 - Wszystkie ścieżki aplikacji poza stroną logowania wymagają uwierzytelnienia (middleware Next.js).
-- Na potrzeby zaliczenia zakładane jest konto dla organizatorów kursu (dostęp do instancji demo).
+- **[ZMIENIONE 2026-08-27, patrz V.48]** Na potrzeby trwałej publikacji prezentacji przez organizatora kursu: na instancji demo istnieje dedykowane konto demo (jego dane logowania są w prezentacji). Dane logowania konta właściciela nie są publikowane nigdzie i nie działają na instancji demo.
 - Poza zakresem MVP: role i uprawnienia (aplikacja ma jednego właściciela danych).
 
-### 3. Rozdział instancji demo i produkcyjnej
+### 3. [ZMIENIONE 2026-08-27, patrz V.48–V.50] Rozdział środowisk: demo / produkcja / dev lokalny
 
-| | Instancja demo | Instancja produkcyjna |
-|---|---|---|
-| Odbiorca | organizatorzy kursu | właściciel projektu |
-| Dane | wyłącznie syntetyczne | rzeczywiste |
-| Termin | do zaliczenia (14 dni) | po zaliczeniu |
+Pierwotny podział (demo dla organizatorów „do zaliczenia" / produkcja „po zaliczeniu")
+zastąpiony docelowym układem trzech środowisk — wymuszonym przez trwałą publikację
+prezentacji z linkiem i danymi logowania na stronie organizatora kursu:
 
-Instancja produkcyjna to osobny projekt Vercel + osobny projekt Supabase, ten sam kod. Rzeczywiste dane nigdy nie trafiają do instancji demo.
+| | Demo (publiczne) | Produkcja (prywatna) | Dev lokalny |
+|---|---|---|---|
+| Odbiorca | organizator kursu, osoby trzecie z opublikowanego linku | właściciel (docelowo sprzedawcy i obsługa klienta) | właściciel |
+| Dane | wyłącznie syntetyczne | rzeczywiste | syntetyczne |
+| Supabase | projekt A (dotychczasowy) | projekt B (nowy), schemat wyłącznie z migracji w repo | lokalny przez Supabase CLI (`supabase start`, Docker) |
+| Vercel | projekt przypięty do gałęzi `demo` (zamrożonej na wersji ocenionej, aktualizowanej wyłącznie świadomie) | projekt przypięty do `main` | `npm run dev` (`.env.local` → localhost) |
+| URL | dotychczasowy (`budzet-app-sigma.vercel.app`) — ten publikowany w prezentacji | nowy, nieujawniany publicznie | localhost |
+| Konto | dedykowane konto demo (dane logowania w prezentacji), z pełnymi uprawnieniami w tym importem (V.48) | konto właściciela, rejestracja wyłączona | — |
+
+Zasady:
+- **Link i hasło publikowane przez organizatora prowadzą do środowiska, w którym nigdy
+  nie będzie ani danych rzeczywistych, ani pracy w toku.**
+- Rzeczywiste dane nigdy nie trafiają do instancji demo ani do lokalnego dev.
+- Ten sam kod dla wszystkich środowisk; różnią się wyłącznie zmiennymi środowiskowymi
+  i gałęzią, z której następuje deploy.
+- Każda migracja SQL po rozwidleniu musi zostać zastosowana na produkcji i lokalnie;
+  na demo wyłącznie przy świadomej aktualizacji gałęzi `demo` (kolejność testowania:
+  lokalnie → produkcja → ewentualnie demo).
 
 ### 4. Import
 
@@ -396,7 +417,7 @@ Instancja produkcyjna to osobny projekt Vercel + osobny projekt Supabase, ten sa
 - Skala danych: rzędu tysięcy wersów, kilkudziesięciu kolumn miesięcznych, kilkuset klientów.
 - Oczekiwany czas importu z walidacją: poniżej 30 sekund (limit funkcji serverless na Vercelu).
 - Generowanie zestawienia: poniżej 3 sekund.
-- **Ograniczenie planu darmowego Supabase:** projekt jest pauzowany po około tygodniu bezczynności. Instancję demo należy odpauzować dzień przed udostępnieniem organizatorom.
+- **[ZMIENIONE 2026-08-27, patrz V.49] Ograniczenie planu darmowego Supabase:** projekt jest pauzowany po około tygodniu niskiej aktywności. Obie instancje chmurowe (demo i produkcja) utrzymywane są aktywne codziennym pingiem podtrzymującym (cron wykonujący trywialne zapytanie do bazy) — plan płatny świadomie odłożony do czasu, gdy z produkcji zaczną korzystać osoby inne niż właściciel.
 
 ### 8. Bezpieczeństwo
 
