@@ -348,6 +348,8 @@ d) **[ZMIENIONE, decyzje V.45/V.46]** Zestawienie 16 prezentowane jest jako peł
 
 50. **[UZUPEŁNIENIE 2026-08-27] Środowisko dev: lokalny Supabase przez CLI (`supabase start`, Docker), nie instancja chmurowa.** `.env.local` wskazuje na localhost — `npm run dev` nie dotyka żadnej bazy chmurowej, migracje są testowane lokalnie zanim trafią na produkcję (wzmacnia zasadę „schemat wyłącznie z migracji w repo"). Rozważono i odrzucono: (a) współdzielenie bazy demo — pierwsza migracja przetestowana lokalnie zmieniłaby schemat bazy, na której działa zamrożony kod gałęzi `demo`, wysypując publiczne demo; (b) trzeci projekt chmurowy — plan darmowy ogranicza do 2 aktywnych projektów, wyczerpanych przez demo i produkcję. Do czasu wykonania konfiguracji lokalnej obowiązuje zakaz uruchamiania importu i migracji z lokalnego dev przeciwko instancjom chmurowym.
 
+51. **[ZMIENIONE 2026-08-28, koryguje V.49] Rezygnacja ze zrzutu tabeli `clients` po kategoryzacji (zadanie `PLAN.md` 6.3).** V.49 uzasadniało zrzut tym, że kategoryzacja słownika istnieje wyłącznie w aplikacji, a plan darmowy Supabase ma zerową retencję backupów. Użytkownik ocenił to uzasadnienie jako nieproporcjonalne dla samego słownika klientów: lista klientów odtwarza się automatycznie z pliku źródłowego przy każdym imporcie (import całościowy, decyzja 2), a ponowne oznaczenie banków/SKOK-ów w UI zajmuje sekundy — koszt ewentualnego odtworzenia jest niższy niż koszt utrzymywania procedury zrzutu. Dla migawek `report_archive` (drugie z danych wymienionych w V.49, jedyne rzeczywiście nieodtwarzalne z pliku źródłowego) uzasadnienie V.49 pozostaje bez zmian — nie dotyczy tej decyzji.
+
 ---
 
 ## VI. [UZUPEŁNIENIE] Wymagania niefunkcjonalne

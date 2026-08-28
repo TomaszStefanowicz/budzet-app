@@ -132,11 +132,13 @@ Cel: opublikowany przez organizatora kursu link i hasło mają prowadzić do śr
 
 Zależy od Etapu 5 w całości. Pierwszy w historii projektu kontakt danych rzeczywistych z instancją, do której nikt poza właścicielem nie ma dostępu — okno czasowe z `SPEC.md` V.41 traci rację bytu.
 
-- [ ] **6.1** Import realnego pliku sprzedażowego na produkcję (przez UI) + backtest zestawień względem budżetu na co najmniej 2 miesiącach. Rozbieżności wyjaśniane jak dotychczas: błąd aplikacji albo błąd źródła.
-- [ ] **6.2** Kategoryzacja słownika klientów (wszyscy wejdą jako „nieokreślony" — narzędzia z zadania 3.7: wyszukiwanie, sortowanie, operacje zbiorcze). Weryfikacja zestawienia 16 po kategoryzacji.
-- [ ] **6.3** Zrzut tabeli `clients` do pliku lokalnego po kategoryzacji (`SPEC.md` V.49 — jedyne dane produkcyjne nieodtwarzalne z pliku źródłowego, obok migawek archiwum).
+- [x] **6.1** Import realnego pliku sprzedażowego na produkcję (przez UI) + backtest zestawień względem budżetu na co najmniej 2 miesiącach. Rozbieżności wyjaśniane jak dotychczas: błąd aplikacji albo błąd źródła. → Wykonane przez właściciela: import zrobiony, zestawienia sprawdzone względem budżetu i zestawień dla funduszy — zgodne.
+- [x] **6.2** Kategoryzacja słownika klientów (wszyscy wejdą jako „nieokreślony" — narzędzia z zadania 3.7: wyszukiwanie, sortowanie, operacje zbiorcze). Weryfikacja zestawienia 16 po kategoryzacji. → Wykonane przez właściciela: oznaczenia banków i SKOK-ów wprowadzone.
+- [x] **6.3** ~~Zrzut tabeli `clients` do pliku lokalnego po kategoryzacji~~ (`SPEC.md` V.49 — jedyne dane produkcyjne nieodtwarzalne z pliku źródłowego, obok migawek archiwum). → **Świadomie pominięte (decyzja użytkownika, `SPEC.md` V.51, koryguje V.49):** lista klientów odtwarza się z pliku źródłowego przy każdym imporcie, a ponowne oznaczenie banków/SKOK-ów w UI zajmuje sekundy — koszt zrzutu i utrzymywania procedury przewyższa koszt ewentualnego odtworzenia. Uzasadnienie V.49 dla migawek `report_archive` (jedynych rzeczywiście nieodtwarzalnych danych) pozostaje bez zmian.
 
-**Kryterium ukończenia:** zestawienia na produkcji zgodne z budżetem, słownik skategoryzowany, zrzut słownika zapisany lokalnie.
+**Kryterium ukończenia — spełnione (bez 6.3, świadomie pominiętego, patrz wyżej):** zestawienia na produkcji zgodne z budżetem, słownik skategoryzowany.
+
+**Etap 6 zamknięty (2026-08-28).**
 
 **Dalsza kolejka po Etapie 6 (bez statusu zadania — każda pozycja wymaga osobnej decyzji/wyceny):** P2 z `DESIGN_SPEC.md` (nawigacja między 16 raportami), dashboard startowy, pytania otwarte P3/P4/P7 poniżej, zapis pełnej listy błędów walidacji w `imports` (notatka przy 1.6c), obserwacja wydajności `/data`.
 
