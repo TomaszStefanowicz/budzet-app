@@ -55,7 +55,7 @@ export default async function ArchivePage(props: PageProps<"/archive">) {
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 bg-gray-50 px-4 py-12">
-      <div className="flex w-full max-w-6xl flex-col gap-3">
+      <div className="sticky top-0 z-20 flex w-full max-w-6xl flex-col gap-3 border-b border-gray-200 bg-gray-50 py-3">
         <Nav active="archive" />
         <div className="flex items-center justify-end gap-3">
           <span className="text-sm font-bold text-red-600">ARCHIWUM</span>
