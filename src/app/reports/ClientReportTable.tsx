@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatZl } from "./formatZl";
+import { formatZl, formatZlPlain } from "./formatZl";
+import { CopyTableButton } from "./CopyTableButton";
 import type { ClientRevenueReportRow } from "@/lib/reports/buildClientMonthlyRevenueReport";
 
 type SortColumn = "nip" | "name" | "revenue" | "invoiceTotal";
@@ -96,6 +97,17 @@ export function ClientReportTable({
     return <p className="text-sm text-gray-500">{emptyMessage}</p>;
   }
 
+  const copyRows: (string | number)[][] = [
+    ["NIP", "Nazwa", revenueLabel, "Suma faktur", "Dokumenty"],
+    ...filtered.map((row) => [
+      row.nip,
+      clientNames[row.nip] ?? "(nieznana nazwa)",
+      formatZlPlain(row.revenueGrosze),
+      formatZlPlain(row.invoiceTotalGrosze),
+      row.documentNumbers.join(", "),
+    ]),
+  ];
+
   return (
     <div>
       <div className="mb-3 flex items-center gap-3">
@@ -109,6 +121,7 @@ export function ClientReportTable({
         <span className="text-sm text-gray-500">
           Wyszukano: {filtered.length} / {rows.length}
         </span>
+        <CopyTableButton rows={copyRows} />
         <div className="ml-auto flex items-center text-sm text-gray-500">
           <span className="mr-2">Suma:</span>
           <span className="w-36 px-2 text-right">{formatZl(totals.revenueGrosze)}</span>

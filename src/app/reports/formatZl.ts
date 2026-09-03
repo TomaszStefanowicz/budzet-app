@@ -14,3 +14,16 @@ export function formatZl(grosze: number): string {
   const zlotyWithSpaces = String(zloty).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   return `${sign}${zlotyWithSpaces},${String(grosz).padStart(2, "0")} zł`;
 }
+
+/**
+ * Kwota bez separatora tysięcy i bez „zł" - do kopiowania do schowka
+ * (`CopyTableButton`), żeby wklejona komórka w Excelu (locale pl-PL,
+ * przecinek dziesiętny) została rozpoznana jako liczba, nie tekst.
+ */
+export function formatZlPlain(grosze: number): string {
+  const sign = grosze < 0 ? "-" : "";
+  const abs = Math.abs(grosze);
+  const zloty = Math.trunc(abs / 100);
+  const grosz = abs % 100;
+  return `${sign}${zloty},${String(grosz).padStart(2, "0")}`;
+}

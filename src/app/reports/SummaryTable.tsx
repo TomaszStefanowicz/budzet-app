@@ -1,9 +1,31 @@
 import type { MonthlySummary } from "@/lib/reports/buildMonthlySummary";
-import { formatZl } from "./formatZl";
+import { formatZl, formatZlPlain } from "./formatZl";
+import { CopyTableButton } from "./CopyTableButton";
 
 export function SummaryTable({ summary }: { summary: MonthlySummary }) {
+  const copyRows: (string | number)[][] = [
+    ["Zestawienie", "Wartość"],
+    ["1. Liczba klientów, którzy zapłacili", summary.payingClientsCount],
+    ["2. Wartość sprzedaży — razem", formatZlPlain(summary.salesBreakdown.total)],
+    ["3. Wartość sprzedaży — klienci nowi (F)", formatZlPlain(summary.salesBreakdown.F)],
+    ["4. Wartość sprzedaży — klienci przedłużający (G)", formatZlPlain(summary.salesBreakdown.G)],
+    ["5. Wartość sprzedaży — dokupienia (H)", formatZlPlain(summary.salesBreakdown.H)],
+    ["6. Wartość sprzedaży — zakupy incydentalne (I)", formatZlPlain(summary.salesBreakdown.I)],
+    ["— w tym korekty (sprzedaż)", formatZlPlain(summary.salesBreakdown.corrections)],
+    ["7. Wartość przychodów — razem", formatZlPlain(summary.revenueBreakdown.total)],
+    ["8. Wartość przychodów — klienci nowi (F)", formatZlPlain(summary.revenueBreakdown.F)],
+    ["9. Wartość przychodów — klienci przedłużający (G)", formatZlPlain(summary.revenueBreakdown.G)],
+    ["10. Wartość przychodów — dokupienia (H)", formatZlPlain(summary.revenueBreakdown.H)],
+    ["11. Wartość przychodów — zakupy incydentalne (I)", formatZlPlain(summary.revenueBreakdown.I)],
+    ["— w tym korekty (przychody)", formatZlPlain(summary.revenueBreakdown.corrections)],
+  ];
+
   return (
-    <table className="w-full table-fixed text-left text-sm">
+    <div>
+      <div className="mb-3 flex justify-end">
+        <CopyTableButton rows={copyRows} />
+      </div>
+      <table className="w-full table-fixed text-left text-sm">
       <thead>
         <tr className="border-b border-gray-200 text-gray-500">
           <th className="py-2 font-medium">Zestawienie</th>
@@ -64,6 +86,7 @@ export function SummaryTable({ summary }: { summary: MonthlySummary }) {
           <td className="py-2 px-2 text-right text-gray-400">{formatZl(summary.revenueBreakdown.corrections)}</td>
         </tr>
       </tbody>
-    </table>
+      </table>
+    </div>
   );
 }
