@@ -7,10 +7,12 @@ import {
   buildExpiringSheetRows,
   buildPackageStartSheetRows,
   buildBanksAndSkoksSheetRows,
+  buildAllExpiringSheetRows,
 } from "@/app/reports/export";
 import { buildMonthlySummary } from "@/lib/reports/buildMonthlySummary";
 import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthlyRevenueReport";
 import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContractsReport";
+import { buildAllExpiringContractsReport } from "@/lib/reports/buildAllExpiringContractsReport";
 import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
 import { buildPackageStartReport } from "@/lib/reports/buildPackageStartReport";
 import { isWithinPackageStartHorizon } from "@/lib/reports/packageStartHorizon";
@@ -54,6 +56,15 @@ export async function GET(request: Request) {
       workbook,
       XLSX.utils.aoa_to_sheet(buildExpiringSheetRows(expiringReport, clientNames)),
       "Zestawienie 13"
+    );
+
+    const allExpiringReport = buildAllExpiringContractsReport(itemMonthFacts, month).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    XLSX.utils.book_append_sheet(
+      workbook,
+      XLSX.utils.aoa_to_sheet(buildAllExpiringSheetRows(allExpiringReport, clientNames)),
+      "Zestawienie 17"
     );
   }
 

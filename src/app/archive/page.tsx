@@ -46,6 +46,9 @@ export default async function ArchivePage(props: PageProps<"/archive">) {
   const expiringEligible = payload.expiringClients !== undefined;
   const expiringReport = (payload.expiringClients ?? []).map(archivedRowToReportRow);
 
+  const allExpiringEligible = payload.allExpiringClients !== undefined;
+  const allExpiringReport = (payload.allExpiringClients ?? []).map(archivedRowToReportRow);
+
   const startEligible = payload.newClients !== undefined;
   const newClientsReport = (payload.newClients ?? []).map(archivedRowToReportRow);
   const renewalStartsReport = (payload.renewalStarts ?? []).map(archivedRowToReportRow);
@@ -118,6 +121,16 @@ export default async function ArchivePage(props: PageProps<"/archive">) {
             ? `Niedostępne jako lista w tej starszej migawce — zapisana wyłącznie liczba: ${payload.summary.banksAndSkoks}.`
             : "Niedostępne w tej migawce."
         }
+      />
+
+      <ReportSection
+        title="17. Klienci, których umowy wygasły w tym miesiącu (wszyscy)"
+        eligible={allExpiringEligible}
+        rows={allExpiringReport}
+        clientNames={clientNames}
+        revenueLabel="Wartość do utraty (miesiąc poprzedni)"
+        emptyMessage="Brak klientów, których umowy wygasły w tym miesiącu."
+        unavailableMessage="Niedostępne w tej migawce — miesiąc był poza horyzontem zestawienia w chwili archiwizacji, albo migawka zapisana przed dodaniem tego zestawienia."
       />
     </div>
   );

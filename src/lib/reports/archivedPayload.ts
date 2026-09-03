@@ -33,6 +33,8 @@ export interface ArchivedPayload {
   banksAndSkoksClients?: ArchivedClientRow[];
   /** Brak, gdy miesiąc był poza horyzontem zestawienia 13 w chwili archiwizacji. */
   expiringClients?: ArchivedClientRow[];
+  /** Brak w migawkach zapisanych przed decyzją V.52, albo gdy miesiąc był poza horyzontem zestawienia 13/17 w chwili archiwizacji. */
+  allExpiringClients?: ArchivedClientRow[];
   /** Brak, gdy miesiąc był poza horyzontem zestawień 14/15 w chwili archiwizacji. */
   newClients?: ArchivedClientRow[];
   renewalStarts?: ArchivedClientRow[];
@@ -83,6 +85,7 @@ export function archivedClientNames(payload: ArchivedPayload): Record<string, st
     ...(payload.clients ?? []),
     ...(payload.banksAndSkoksClients ?? []),
     ...(payload.expiringClients ?? []),
+    ...(payload.allExpiringClients ?? []),
     ...(payload.newClients ?? []),
     ...(payload.renewalStarts ?? []),
   ];

@@ -7,6 +7,7 @@ import type { FlagBreakdown } from "@/lib/reports/sumByFlag";
 import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthlyRevenueReport";
 import type { ClientRevenueReportRow } from "@/lib/reports/buildClientMonthlyRevenueReport";
 import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContractsReport";
+import { buildAllExpiringContractsReport } from "@/lib/reports/buildAllExpiringContractsReport";
 import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
 import { buildPackageStartReport } from "@/lib/reports/buildPackageStartReport";
 import { isWithinPackageStartHorizon } from "@/lib/reports/packageStartHorizon";
@@ -86,6 +87,11 @@ export async function archiveReport(month: string): Promise<{ archivedAt: string
       (a, b) => b.revenueGrosze - a.revenueGrosze
     );
     payload.expiringClients = toClientPayload(expiringReport, clientNames);
+
+    const allExpiringReport = buildAllExpiringContractsReport(itemMonthFacts, month).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    payload.allExpiringClients = toClientPayload(allExpiringReport, clientNames);
   }
 
   if (isWithinPackageStartHorizon(availableMonths, month)) {

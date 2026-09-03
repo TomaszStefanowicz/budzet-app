@@ -32,6 +32,7 @@ import { buildClientMonthlyRevenueReport } from "../src/lib/reports/buildClientM
 import type { ItemMonthFact } from "../src/lib/reports/buildClientMonthlyRevenueReport.ts";
 import { filterBanksAndSkoks } from "../src/lib/reports/filterBanksAndSkoks.ts";
 import { buildExpiringContractsReport } from "../src/lib/reports/buildExpiringContractsReport.ts";
+import { buildAllExpiringContractsReport } from "../src/lib/reports/buildAllExpiringContractsReport.ts";
 import { isWithinExpiringHorizon } from "../src/lib/reports/expiringReportHorizon.ts";
 import { buildPackageStartReport } from "../src/lib/reports/buildPackageStartReport.ts";
 import { isWithinPackageStartHorizon } from "../src/lib/reports/packageStartHorizon.ts";
@@ -192,7 +193,7 @@ async function main() {
     : await factsFromDatabase();
   const source = filePath ? `plik ${filePath} (baza nie była dotykana)` : "baza Supabase";
 
-  console.log(`Zestawienia 1-16 (podgląd) - miesiąc ${targetMonth} - źródło: ${source}\n`);
+  console.log(`Zestawienia 1-17 (podgląd) - miesiąc ${targetMonth} - źródło: ${source}\n`);
 
   const paying = aggregateMonthlyRevenuePerClient(
     itemMonthFacts.map((f) => ({ nip: f.nip, month: f.month, amountGrosze: f.monthlyAmountGrosze }))
@@ -244,6 +245,17 @@ async function main() {
     );
     console.log(`\n13. Klienci, których umowy wygasły w ${targetMonth} i dotychczas nie przedłużyli (${expiring.length}):`);
     for (const row of expiring) {
+      const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
+      console.log(
+        `${row.nip}\t${name}\twartość do utraty (mies. poprzedni): ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
+      );
+    }
+
+    const allExpiring = buildAllExpiringContractsReport(itemMonthFacts, targetMonth).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    console.log(`\n17. Klienci, których umowy wygasły w ${targetMonth} (wszyscy) (${allExpiring.length}):`);
+    for (const row of allExpiring) {
       const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
       console.log(
         `${row.nip}\t${name}\twartość do utraty (mies. poprzedni): ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`

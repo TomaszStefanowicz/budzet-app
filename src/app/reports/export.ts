@@ -77,3 +77,10 @@ export function buildBanksAndSkoksSheetRows(
 ): SheetCell[][] {
   return buildClientTableSheetRows(banksAndSkoksReport, clientNames, "Przychód miesiąca");
 }
+
+export function buildAllExpiringSheetRows(
+  allExpiringReport: ClientRevenueReportRow[],
+  clientNames: Map<string, string>
+): SheetCell[][] {
+  return buildClientTableSheetRows(allExpiringReport, clientNames, "Wartość do utraty (miesiąc poprzedni)");
+}

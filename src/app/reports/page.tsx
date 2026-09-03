@@ -2,6 +2,7 @@ import { loadAvailableMonths, loadReportFacts } from "./data";
 import { buildMonthlySummary } from "@/lib/reports/buildMonthlySummary";
 import { buildClientMonthlyRevenueReport } from "@/lib/reports/buildClientMonthlyRevenueReport";
 import { buildExpiringContractsReport } from "@/lib/reports/buildExpiringContractsReport";
+import { buildAllExpiringContractsReport } from "@/lib/reports/buildAllExpiringContractsReport";
 import { isWithinExpiringHorizon } from "@/lib/reports/expiringReportHorizon";
 import { buildPackageStartReport } from "@/lib/reports/buildPackageStartReport";
 import { isWithinPackageStartHorizon } from "@/lib/reports/packageStartHorizon";
@@ -58,6 +59,9 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
   const expiringEligible = isWithinExpiringHorizon(months, selectedMonth);
   const expiringReport = expiringEligible
     ? buildExpiringContractsReport(itemMonthFacts, selectedMonth).sort((a, b) => b.revenueGrosze - a.revenueGrosze)
+    : [];
+  const allExpiringReport = expiringEligible
+    ? buildAllExpiringContractsReport(itemMonthFacts, selectedMonth).sort((a, b) => b.revenueGrosze - a.revenueGrosze)
     : [];
 
   const startEligible = isWithinPackageStartHorizon(months, selectedMonth);
@@ -150,6 +154,20 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
           emptyMessage="Brak banków/SKOK-ów z przychodem w tym miesiącu."
         />
       </div>
+
+      <ReportSection
+        title="17. Klienci, których umowy wygasły w tym miesiącu (wszyscy)"
+        eligible={expiringEligible}
+        rows={allExpiringReport}
+        clientNames={clientNames}
+        revenueLabel="Wartość do utraty (miesiąc poprzedni)"
+        emptyMessage="Brak klientów, których umowy wygasły w tym miesiącu."
+        unavailableMessage={
+          months.length >= 3
+            ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca poprzedniego i następnego w danych (dostępne dla ${months[1]} – ${months[months.length - 2]}).`
+            : "Niedostępne — zestawienie wymaga co najmniej 3 miesięcy danych."
+        }
+      />
     </div>
   );
 }
