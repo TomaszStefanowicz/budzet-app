@@ -4,6 +4,18 @@ import { UploadForm } from "./UploadForm";
 import { StatusBadge } from "./components/StatusBadge";
 import { Nav } from "./components/Nav";
 
+function formatImportedAt(isoString: string): string {
+  return new Date(isoString).toLocaleString("pl-PL", {
+    timeZone: "Europe/Warsaw",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+}
+
 function formatMonthRange(from: string | null, to: string | null): string {
   if (!from || !to) return "—";
   const toYearMonth = (date: string) => date.slice(0, 7).replace("-", "/");
@@ -58,9 +70,7 @@ export default async function Home() {
               <tbody>
                 {imports.map((row) => (
                   <tr key={row.id} className="border-b border-gray-100 even:bg-gray-50">
-                    <td className="py-2">
-                      {new Date(row.imported_at).toLocaleString("pl-PL")}
-                    </td>
+                    <td className="py-2">{formatImportedAt(row.imported_at)}</td>
                     <td className="py-2">{row.file_name}</td>
                     <td className="py-2 text-center">{row.row_count}</td>
                     <td className="py-2 text-center">{formatMonthRange(row.detected_month_from, row.detected_month_to)}</td>
