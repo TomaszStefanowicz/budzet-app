@@ -104,7 +104,21 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
       </div>
 
       <ReportSection
-        title="13. Klienci, których umowy wygasły w tym miesiącu i dotychczas nie przedłużyli"
+        title="13. Klienci, których umowy wygasły w tym miesiącu (wszyscy)"
+        eligible={expiringEligible}
+        rows={allExpiringReport}
+        clientNames={clientNames}
+        revenueLabel="Wartość do utraty (miesiąc poprzedni)"
+        emptyMessage="Brak klientów, których umowy wygasły w tym miesiącu."
+        unavailableMessage={
+          months.length >= 3
+            ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca poprzedniego i następnego w danych (dostępne dla ${months[1]} – ${months[months.length - 2]}).`
+            : "Niedostępne — zestawienie wymaga co najmniej 3 miesięcy danych."
+        }
+      />
+
+      <ReportSection
+        title="14. Klienci, których umowy wygasły w tym miesiącu i dotychczas nie przedłużyli"
         eligible={expiringEligible}
         rows={expiringReport}
         clientNames={clientNames}
@@ -114,20 +128,6 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
           months.length >= 3
             ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca poprzedniego i następnego w danych (dostępne dla ${months[1]} – ${months[months.length - 2]}).`
             : "Niedostępne — zestawienie wymaga co najmniej 3 miesięcy danych."
-        }
-      />
-
-      <ReportSection
-        title="14. Nowi klienci, których pakiet zaczyna się w tym miesiącu"
-        eligible={startEligible}
-        rows={newClientsReport}
-        clientNames={clientNames}
-        revenueLabel="Wartość (pierwszy pełny miesiąc)"
-        emptyMessage="Brak nowych klientów zaczynających w tym miesiącu."
-        unavailableMessage={
-          months.length >= 2
-            ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca następnego w danych (dostępne do ${months[months.length - 2]}).`
-            : "Niedostępne — zestawienie wymaga co najmniej 2 miesięcy danych."
         }
       />
 
@@ -145,8 +145,22 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
         }
       />
 
+      <ReportSection
+        title="16. Nowi klienci, których pakiet zaczyna się w tym miesiącu"
+        eligible={startEligible}
+        rows={newClientsReport}
+        clientNames={clientNames}
+        revenueLabel="Wartość (pierwszy pełny miesiąc)"
+        emptyMessage="Brak nowych klientów zaczynających w tym miesiącu."
+        unavailableMessage={
+          months.length >= 2
+            ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca następnego w danych (dostępne do ${months[months.length - 2]}).`
+            : "Niedostępne — zestawienie wymaga co najmniej 2 miesięcy danych."
+        }
+      />
+
       <div className="w-full max-w-6xl rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-xl font-bold text-gray-900">16. Banki i SKOK-i wśród płacących klientów</h2>
+        <h2 className="mb-4 text-xl font-bold text-gray-900">17. Banki i SKOK-i wśród płacących klientów</h2>
         <ClientReportTable
           rows={banksAndSkoksReport}
           clientNames={clientNames}
@@ -154,20 +168,6 @@ export default async function ReportsPage(props: PageProps<"/reports">) {
           emptyMessage="Brak banków/SKOK-ów z przychodem w tym miesiącu."
         />
       </div>
-
-      <ReportSection
-        title="17. Klienci, których umowy wygasły w tym miesiącu (wszyscy)"
-        eligible={expiringEligible}
-        rows={allExpiringReport}
-        clientNames={clientNames}
-        revenueLabel="Wartość do utraty (miesiąc poprzedni)"
-        emptyMessage="Brak klientów, których umowy wygasły w tym miesiącu."
-        unavailableMessage={
-          months.length >= 3
-            ? `Niedostępne dla tego miesiąca — zestawienie wymaga widocznego miesiąca poprzedniego i następnego w danych (dostępne dla ${months[1]} – ${months[months.length - 2]}).`
-            : "Niedostępne — zestawienie wymaga co najmniej 3 miesięcy danych."
-        }
-      />
     </div>
   );
 }

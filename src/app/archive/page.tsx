@@ -80,22 +80,22 @@ export default async function ArchivePage(props: PageProps<"/archive">) {
       </div>
 
       <ReportSection
-        title="13. Klienci, których umowy wygasły w tym miesiącu i dotychczas nie przedłużyli"
+        title="13. Klienci, których umowy wygasły w tym miesiącu (wszyscy)"
+        eligible={allExpiringEligible}
+        rows={allExpiringReport}
+        clientNames={clientNames}
+        revenueLabel="Wartość do utraty (miesiąc poprzedni)"
+        emptyMessage="Brak klientów, których umowy wygasły w tym miesiącu."
+        unavailableMessage="Niedostępne w tej migawce — miesiąc był poza horyzontem zestawienia w chwili archiwizacji, albo migawka zapisana przed dodaniem tego zestawienia."
+      />
+
+      <ReportSection
+        title="14. Klienci, których umowy wygasły w tym miesiącu i dotychczas nie przedłużyli"
         eligible={expiringEligible}
         rows={expiringReport}
         clientNames={clientNames}
         revenueLabel="Wartość do utraty (miesiąc poprzedni)"
         emptyMessage="Brak klientów, których umowy wygasły w tym miesiącu i dotychczas nie przedłużyli."
-        unavailableMessage="Niedostępne w tej migawce — miesiąc był poza horyzontem zestawienia w chwili archiwizacji."
-      />
-
-      <ReportSection
-        title="14. Nowi klienci, których pakiet zaczyna się w tym miesiącu"
-        eligible={startEligible}
-        rows={newClientsReport}
-        clientNames={clientNames}
-        revenueLabel="Wartość (pierwszy pełny miesiąc)"
-        emptyMessage="Brak nowych klientów zaczynających w tym miesiącu."
         unavailableMessage="Niedostępne w tej migawce — miesiąc był poza horyzontem zestawienia w chwili archiwizacji."
       />
 
@@ -110,7 +110,17 @@ export default async function ArchivePage(props: PageProps<"/archive">) {
       />
 
       <ReportSection
-        title="16. Banki i SKOK-i wśród płacących klientów"
+        title="16. Nowi klienci, których pakiet zaczyna się w tym miesiącu"
+        eligible={startEligible}
+        rows={newClientsReport}
+        clientNames={clientNames}
+        revenueLabel="Wartość (pierwszy pełny miesiąc)"
+        emptyMessage="Brak nowych klientów zaczynających w tym miesiącu."
+        unavailableMessage="Niedostępne w tej migawce — miesiąc był poza horyzontem zestawienia w chwili archiwizacji."
+      />
+
+      <ReportSection
+        title="17. Banki i SKOK-i wśród płacących klientów"
         eligible={banksAndSkoksAvailable}
         rows={banksAndSkoksReport}
         clientNames={clientNames}
@@ -121,16 +131,6 @@ export default async function ArchivePage(props: PageProps<"/archive">) {
             ? `Niedostępne jako lista w tej starszej migawce — zapisana wyłącznie liczba: ${payload.summary.banksAndSkoks}.`
             : "Niedostępne w tej migawce."
         }
-      />
-
-      <ReportSection
-        title="17. Klienci, których umowy wygasły w tym miesiącu (wszyscy)"
-        eligible={allExpiringEligible}
-        rows={allExpiringReport}
-        clientNames={clientNames}
-        revenueLabel="Wartość do utraty (miesiąc poprzedni)"
-        emptyMessage="Brak klientów, których umowy wygasły w tym miesiącu."
-        unavailableMessage="Niedostępne w tej migawce — miesiąc był poza horyzontem zestawienia w chwili archiwizacji, albo migawka zapisana przed dodaniem tego zestawienia."
       />
     </div>
   );

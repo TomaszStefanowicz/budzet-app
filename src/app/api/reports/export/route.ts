@@ -49,35 +49,26 @@ export async function GET(request: Request) {
   );
 
   if (isWithinExpiringHorizon(availableMonths, month)) {
-    const expiringReport = buildExpiringContractsReport(itemMonthFacts, month).sort(
-      (a, b) => b.revenueGrosze - a.revenueGrosze
-    );
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.aoa_to_sheet(buildExpiringSheetRows(expiringReport, clientNames)),
-      "Zestawienie 13"
-    );
-
     const allExpiringReport = buildAllExpiringContractsReport(itemMonthFacts, month).sort(
       (a, b) => b.revenueGrosze - a.revenueGrosze
     );
     XLSX.utils.book_append_sheet(
       workbook,
       XLSX.utils.aoa_to_sheet(buildAllExpiringSheetRows(allExpiringReport, clientNames)),
-      "Zestawienie 17"
+      "Zestawienie 13"
     );
-  }
 
-  if (isWithinPackageStartHorizon(availableMonths, month)) {
-    const newClientsReport = buildPackageStartReport(itemMonthFacts, "F", month).sort(
+    const expiringReport = buildExpiringContractsReport(itemMonthFacts, month).sort(
       (a, b) => b.revenueGrosze - a.revenueGrosze
     );
     XLSX.utils.book_append_sheet(
       workbook,
-      XLSX.utils.aoa_to_sheet(buildPackageStartSheetRows(newClientsReport, clientNames)),
+      XLSX.utils.aoa_to_sheet(buildExpiringSheetRows(expiringReport, clientNames)),
       "Zestawienie 14"
     );
+  }
 
+  if (isWithinPackageStartHorizon(availableMonths, month)) {
     const renewalStartsReport = buildPackageStartReport(itemMonthFacts, "G", month).sort(
       (a, b) => b.revenueGrosze - a.revenueGrosze
     );
@@ -86,12 +77,21 @@ export async function GET(request: Request) {
       XLSX.utils.aoa_to_sheet(buildPackageStartSheetRows(renewalStartsReport, clientNames)),
       "Zestawienie 15"
     );
+
+    const newClientsReport = buildPackageStartReport(itemMonthFacts, "F", month).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    XLSX.utils.book_append_sheet(
+      workbook,
+      XLSX.utils.aoa_to_sheet(buildPackageStartSheetRows(newClientsReport, clientNames)),
+      "Zestawienie 16"
+    );
   }
 
   XLSX.utils.book_append_sheet(
     workbook,
     XLSX.utils.aoa_to_sheet(buildBanksAndSkoksSheetRows(banksAndSkoksReport, clientNames)),
-    "Zestawienie 16"
+    "Zestawienie 17"
   );
 
   const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }) as Buffer;

@@ -219,43 +219,28 @@ async function main() {
     );
   }
 
-  if (clientTypes === null) {
-    console.log(
-      "\n16. (niedostępne w trybie --file - typ klienta jest wyłącznie w słowniku aplikacji, nie w pliku źródłowym)"
-    );
-  } else {
-    const banksAndSkoks = filterBanksAndSkoks(report, clientTypes);
-    console.log(`\n16. Banki i SKOK-i wśród płacących klientów (${banksAndSkoks.length}):`);
-    for (const row of banksAndSkoks) {
-      const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
-      console.log(
-        `${row.nip}\t${name}\tprzychód miesiąca: ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
-      );
-    }
-  }
-
   const availableMonths = Array.from(new Set(itemMonthFacts.map((f) => f.month))).sort();
   if (!isWithinExpiringHorizon(availableMonths, targetMonth)) {
     console.log(
-      `\n13. (niedostępne dla ${targetMonth} - reguła horyzontu 13.d wymaga widocznego miesiąca poprzedniego i następnego w danych; dostępne dla ${availableMonths[1]} – ${availableMonths[availableMonths.length - 2]})`
+      `\n13-14. (niedostępne dla ${targetMonth} - reguła horyzontu 13.d wymaga widocznego miesiąca poprzedniego i następnego w danych; dostępne dla ${availableMonths[1]} – ${availableMonths[availableMonths.length - 2]})`
     );
   } else {
-    const expiring = buildExpiringContractsReport(itemMonthFacts, targetMonth).sort(
+    const allExpiring = buildAllExpiringContractsReport(itemMonthFacts, targetMonth).sort(
       (a, b) => b.revenueGrosze - a.revenueGrosze
     );
-    console.log(`\n13. Klienci, których umowy wygasły w ${targetMonth} i dotychczas nie przedłużyli (${expiring.length}):`);
-    for (const row of expiring) {
+    console.log(`\n13. Klienci, których umowy wygasły w ${targetMonth} (wszyscy) (${allExpiring.length}):`);
+    for (const row of allExpiring) {
       const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
       console.log(
         `${row.nip}\t${name}\twartość do utraty (mies. poprzedni): ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
       );
     }
 
-    const allExpiring = buildAllExpiringContractsReport(itemMonthFacts, targetMonth).sort(
+    const expiring = buildExpiringContractsReport(itemMonthFacts, targetMonth).sort(
       (a, b) => b.revenueGrosze - a.revenueGrosze
     );
-    console.log(`\n17. Klienci, których umowy wygasły w ${targetMonth} (wszyscy) (${allExpiring.length}):`);
-    for (const row of allExpiring) {
+    console.log(`\n14. Klienci, których umowy wygasły w ${targetMonth} i dotychczas nie przedłużyli (${expiring.length}):`);
+    for (const row of expiring) {
       const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
       console.log(
         `${row.nip}\t${name}\twartość do utraty (mies. poprzedni): ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
@@ -265,20 +250,9 @@ async function main() {
 
   if (!isWithinPackageStartHorizon(availableMonths, targetMonth)) {
     console.log(
-      `\n14-15. (niedostępne dla ${targetMonth} - reguła horyzontu 14.c/15.c wymaga widocznego miesiąca następnego w danych; dostępne do ${availableMonths[availableMonths.length - 2]})`
+      `\n15-16. (niedostępne dla ${targetMonth} - reguła horyzontu 14.c/15.c wymaga widocznego miesiąca następnego w danych; dostępne do ${availableMonths[availableMonths.length - 2]})`
     );
   } else {
-    const newClients = buildPackageStartReport(itemMonthFacts, "F", targetMonth).sort(
-      (a, b) => b.revenueGrosze - a.revenueGrosze
-    );
-    console.log(`\n14. Nowi klienci, których pakiet zaczyna się w ${targetMonth} (${newClients.length}):`);
-    for (const row of newClients) {
-      const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
-      console.log(
-        `${row.nip}\t${name}\twartość (pierwszy pełny miesiąc): ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
-      );
-    }
-
     const renewalStarts = buildPackageStartReport(itemMonthFacts, "G", targetMonth).sort(
       (a, b) => b.revenueGrosze - a.revenueGrosze
     );
@@ -287,6 +261,32 @@ async function main() {
       const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
       console.log(
         `${row.nip}\t${name}\twartość (pierwszy pełny miesiąc): ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
+      );
+    }
+
+    const newClients = buildPackageStartReport(itemMonthFacts, "F", targetMonth).sort(
+      (a, b) => b.revenueGrosze - a.revenueGrosze
+    );
+    console.log(`\n16. Nowi klienci, których pakiet zaczyna się w ${targetMonth} (${newClients.length}):`);
+    for (const row of newClients) {
+      const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
+      console.log(
+        `${row.nip}\t${name}\twartość (pierwszy pełny miesiąc): ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
+      );
+    }
+  }
+
+  if (clientTypes === null) {
+    console.log(
+      "\n17. (niedostępne w trybie --file - typ klienta jest wyłącznie w słowniku aplikacji, nie w pliku źródłowym)"
+    );
+  } else {
+    const banksAndSkoks = filterBanksAndSkoks(report, clientTypes);
+    console.log(`\n17. Banki i SKOK-i wśród płacących klientów (${banksAndSkoks.length}):`);
+    for (const row of banksAndSkoks) {
+      const name = clientNames.get(row.nip) ?? "(nieznana nazwa)";
+      console.log(
+        `${row.nip}\t${name}\tprzychód miesiąca: ${formatGrosze(row.revenueGrosze)}\tsuma faktur: ${formatGrosze(row.invoiceTotalGrosze)}\tdokumenty: ${row.documentNumbers.join(", ")}`
       );
     }
   }
